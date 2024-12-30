@@ -29,15 +29,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const corsOptions = {
+/* const corsOptions = {
   origin: 'http://localhost:5173', // Reemplaza con la URL de tu frontend
   credentials: true, // Permitir envío de cookies o headers de autenticación
-};
+}; */
 
 app.use(morgan('dev'));
 // Middleware
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(cookieParser());
 
 
