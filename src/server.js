@@ -83,3 +83,5 @@ sequelize.sync({ force: false }) // Usa { force: false } para evitar que elimine
   .catch((err) => {
     console.error('Error al sincronizar la base de datos:', err);
   });
+
+  module.exports = app;
