@@ -31,11 +31,11 @@ const authController = {
         { expiresIn: process.env.JWT_EXPIRES_IN }
       );
       
-      /* res.cookie('token', token, {
+      res.cookie('token', token, {
        httpOnly: true,
        secure: true,
        sameSite: 'lax',
-     });  */
+     }); 
      
       //Enviar respuesta al frontend
       res.status(200).json({
