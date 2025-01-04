@@ -42,13 +42,22 @@ const facturacionController = {
       }
   
       // Construir la URL completa de cada documento
-      const baseUrl = process.env.API_URL || 'https://proyecto-codisert-back-end-sequialize.onrender.com'; // Puedes obtener la base URL de una variable de entorno
+      const baseUrl = process.env.API_URL || 'https://proyecto-codisert-back-end-sequialize.onrender.com'; // URL base de tu servidor
   
-      // Asumiendo que cada documento tiene una propiedad 'filePath' que contiene el nombre o ruta del archivo
-      const documentsWithUrls = documents.map(document => ({
-        ...document.dataValues, // Incluye todos los datos del documento
-        fileUrl: `${baseUrl}/${document.Url}`, // Agrega la URL completa del archivo
-      }));
+      // Asumiendo que cada documento tiene una propiedad 'Url' que contiene el nombre o la ruta del archivo
+      const documentsWithUrls = documents.map(document => {
+        const fileUrl = document.Url;
+  
+        // Si el campo 'Url' ya contiene una URL completa (verificar si empieza con 'http://'), usamos la URL tal cual
+        const finalUrl = fileUrl.startsWith('http://') || fileUrl.startsWith('https://')
+          ? fileUrl  // Si ya es una URL completa, no hacer nada
+          : `${baseUrl}/${fileUrl}`;  // Si es una ruta relativa, agregamos la base URL
+  
+        return {
+          ...document.dataValues, // Incluye todos los datos del documento
+          fileUrl: finalUrl, // Agrega la URL final del archivo
+        };
+      });
   
       res.status(200).json({
         message: 'Documentos obtenidos correctamente.',
