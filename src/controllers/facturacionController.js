@@ -36,14 +36,23 @@ const facturacionController = {
     try {
       // Obtener todos los documentos de la base de datos
       const documents = await Facturacion.findAll();
-
+  
       if (documents.length === 0) {
         return res.status(404).json({ message: 'No se encontraron documentos.' });
       }
-
+  
+      // Construir la URL completa de cada documento
+      const baseUrl = process.env.API_URL || 'https://proyecto-codisert-back-end-sequialize.onrender.com'; // Puedes obtener la base URL de una variable de entorno
+  
+      // Asumiendo que cada documento tiene una propiedad 'filePath' que contiene el nombre o ruta del archivo
+      const documentsWithUrls = documents.map(document => ({
+        ...document.dataValues, // Incluye todos los datos del documento
+        fileUrl: `${baseUrl}/uploads/${document.filePath}`, // Agrega la URL completa del archivo
+      }));
+  
       res.status(200).json({
         message: 'Documentos obtenidos correctamente.',
-        documentos: documents,
+        documentos: documentsWithUrls,
       });
     } catch (error) {
       console.error(error);
