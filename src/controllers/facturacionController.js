@@ -77,27 +77,44 @@ const facturacionController = {
   async deleteDocument(req, res) {
     try {
       const { idFacturacion } = req.params;
+      
+      console.log(`ID de facturación recibido: ${idFacturacion}`); // Imprime el ID recibido en los parámetros
   
-      // Buscar el documento en la base de datos
-      const document = await Facturacion.findByPk(idFacturacion);
+      // Buscar el documento para obtener la URL del archivo
+      const facturacion = await Facturacion.findOne({ where: { idFacturacion } });
   
-      if (!document) {
-        return res.status(404).json({ message: 'Documento no encontrado.' });
+      if (!facturacion) {
+        return res.status(404).json({ message: 'Documento no encontrado' });
       }
   
-      // Eliminar el archivo físico del sistema de archivos
-      const filePath = path.join(__dirname, '..', document.Url); // Construir la ruta completa del archivo
-      await fs.unlink(filePath); // Eliminar el archivo
+      // Imprimir el objeto de facturación completo para ver qué datos contiene
+      console.log('Facturación encontrada:', facturacion);
+  
+     // Extraer la ruta relativa del archivo desde Url
+     const relativePath = facturacion.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
+     const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta
+ 
+  
+      console.log(`Intentando eliminar el archivo en la ruta: ${filePath}`);
+  
+      // Intentar eliminar el archivo del sistema de archivos
+      try {
+        await fs.unlink(filePath); // Usamos fs.promises.unlink para eliminar el archivo
+        console.log(`Archivo eliminado exitosamente en la ruta: ${filePath}`);
+      } catch (err) {
+        console.error(`Error al eliminar el archivo: ${filePath}`, err);
+        return res.status(500).json({ message: 'No se pudo eliminar el archivo del servidor', error: err.message });
+      }
   
       // Eliminar el documento de la base de datos
-      await document.destroy();
-  
-      res.status(200).json({
-        message: 'Documento eliminado correctamente.',
+      await Facturacion.destroy({
+        where: { idFacturacion },
       });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error al eliminar el documento.', error });
+  
+      res.status(200).json({ message: 'Documento eliminado exitosamente' });
+    } catch (err) {
+      console.error('Error al eliminar el documento:', err);
+      res.status(500).json({ message: 'Error al eliminar el documento', error: err.message });
     }
   },
 
