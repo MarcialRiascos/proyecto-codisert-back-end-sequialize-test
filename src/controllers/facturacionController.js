@@ -91,7 +91,7 @@ const facturacionController = {
       console.log('Facturación encontrada:', facturacion);
   
      // Extraer la ruta relativa del archivo desde Url
-     const relativePath = facturacion.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
+     const relativePath = facturacion.Url.replace(/^https?:\/\/(?:localhost:\d+|[a-zA-Z0-9-]+\.onrender\.com|src\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,6})\//, '');
      const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta
  
   
