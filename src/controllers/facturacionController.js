@@ -47,7 +47,7 @@ const facturacionController = {
       // Asumiendo que cada documento tiene una propiedad 'filePath' que contiene el nombre o ruta del archivo
       const documentsWithUrls = documents.map(document => ({
         ...document.dataValues, // Incluye todos los datos del documento
-        fileUrl: `${baseUrl}/uploads/${document.filePath}`, // Agrega la URL completa del archivo
+        fileUrl: `${baseUrl}/${document.Url}`, // Agrega la URL completa del archivo
       }));
   
       res.status(200).json({
