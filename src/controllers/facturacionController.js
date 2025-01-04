@@ -77,8 +77,8 @@ const facturacionController = {
   async deleteDocument(req, res) {
     try {
       const { idFacturacion } = req.params;
-      
-      console.log(`ID de facturación recibido: ${idFacturacion}`); // Imprime el ID recibido en los parámetros
+  
+      console.log(`ID de facturación recibido: ${idFacturacion}`);
   
       // Buscar el documento para obtener la URL del archivo
       const facturacion = await Facturacion.findOne({ where: { idFacturacion } });
@@ -87,13 +87,11 @@ const facturacionController = {
         return res.status(404).json({ message: 'Documento no encontrado' });
       }
   
-      // Imprimir el objeto de facturación completo para ver qué datos contiene
       console.log('Facturación encontrada:', facturacion);
   
-     // Extraer la ruta relativa del archivo desde Url
-     const relativePath = facturacion.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
-     const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta
- 
+      // Extraer la ruta relativa del archivo desde Url
+      const relativePath = facturacion.Url.replace(/^https?:\/\/[^/]+\//, ''); // Elimina "http://localhost:3000/" o "https://proyecto-codisert-back-end-sequialize.onrender.com/"
+      const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta
   
       console.log(`Intentando eliminar el archivo en la ruta: ${filePath}`);
   
@@ -117,8 +115,6 @@ const facturacionController = {
       res.status(500).json({ message: 'Error al eliminar el documento', error: err.message });
     }
   },
-
-  
   
   // Usamos el middleware de multer para la carga del archivo
   uploadMiddleware: upload.single('archivo'), // 'archivo' es el nombre del campo en el formulario
