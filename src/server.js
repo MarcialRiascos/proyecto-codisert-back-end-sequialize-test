@@ -30,8 +30,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Reemplaza con la URL de tu frontend
-  credentials: true, // Permitir envío de cookies o headers de autenticación
+  origin: 'http://localhost:5173', // URL de tu frontend
+  credentials: true, // Permitir cookies y credenciales
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
 };
 
 app.use(morgan('dev'));
