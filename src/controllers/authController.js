@@ -33,9 +33,8 @@ const authController = {
       
       res.cookie('token', token, {
        httpOnly: true,
-      //  secure: true,
-       sameSite: 'None',
-       path: '/'
+       secure: true,
+       sameSite: 'lax',
      }); 
      
       //Enviar respuesta al frontend
