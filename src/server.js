@@ -30,7 +30,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: 'https://stirring-marshmallow-9a3406.netlify.app', // URL de tu frontend
+  origin: 'https://silver-blancmange-870a19.netlify.app', // URL de tu frontend
   credentials: true, // Permitir cookies y credenciales
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
