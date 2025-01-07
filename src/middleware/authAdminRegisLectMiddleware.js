@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 
 // Middleware para verificar que el usuario tenga uno de los roles permitidos
 const authMiddleware = (req, res, next) => {
-  const token = req.cookies.token
+  // const token = req.cookies.token
   
-  // const token = req.headers.authorization?.split(' ')[1];  // Obtener el token del header
+  const token = req.headers.authorization?.split(' ')[1];  // Obtener el token del header
   if (!token) return res.status(401).json({ message: 'Token no proporcionado' });
 
   try {
