@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mysql',
+    dialect: 'mysql2',
     logging: false,
     timezone: '-05:00', // Configura la zona horaria a UTC-5
     dialectOptions: {
