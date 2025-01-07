@@ -30,19 +30,25 @@ const authController = {
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
       );
-      
+
       res.cookie('token', token, {
-       httpOnly: true,
-       secure: true,
-       sameSite: 'lax',
-     }); 
-     
-      //Enviar respuesta al frontend
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+      });
+
+      // Enviar respuesta al frontend
       res.status(200).json({
         message: 'Inicio de sesión exitoso',
         token,
         role: role.Rol,
-        user: { id: user.idAdministrador, name: user.Nombre, email: user.Correo },
+        user: {
+          id: user.idAdministrador,
+          name: user.Nombre,
+          lastname: user.Apellido, // Asegúrate de que la columna 'Apellido' exista en el modelo
+          email: user.Correo,
+          role: role.Rol, // Incluyendo el rol
+        },
       });
 
     } catch (err) {
