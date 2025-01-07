@@ -30,7 +30,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: 'https://front-codi-test.vercel.app', // URL de tu frontend
+  origin: ['https://proyecto-codisert-frontend.vercel.app'], // URL de tu frontend
   credentials: true, // Permitir cookies y credenciales
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
