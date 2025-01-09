@@ -299,8 +299,10 @@ const registerDocumentController = {
   
       // Extraer la ruta relativa del archivo desde Url
     
-      const relativePath = documento.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
-      const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta
+      /* const relativePath = documento.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
+      const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta */
+
+      const filePath = path.resolve(__dirname, '..', '..', doc.Url.replace(/^https?:\/\/[^/]+\//, ''));
   
       // Intentar eliminar el archivo del sistema de archivos
       try {
