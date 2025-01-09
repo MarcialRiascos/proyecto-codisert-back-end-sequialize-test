@@ -7,35 +7,49 @@ const TipoDocumento = require('../models/TipoDocumento');
 const Administrador = require('../models/Administrador');
 const Sexo = require('../models/Sexo'); // Modelo de Sexo
 const Documento = require('../models/Documento'); // Modelo de Sexo
+const path = require('path'); // Asegúrate de importar 'path' al principio de tu archivo
+const fs = require('fs').promises; // Asegúrate de importar 'fs' correctamente
 
 const registerBeneficiaryController = {
   // Registrar un beneficiario
   async registerBeneficiary(req, res) {
     const {
+      Contrato,
       Nombre,
       Apellido,
       TipoDocumento_idTipoDocumento,
       NumeroDocumento,
       Telefono,
       Celular,
+      TelefonoTres,
       Correo,
-      FechaNacimiento,  // Nuevo campo para fecha de nacimiento
-      FechaInicio,      // Campo actualizado a tipo DATE
-      FechaFin,         // Campo actualizado a tipo DATE
+      FechaNacimiento,
+      FechaInicio,
+      FechaFin,
       CodigoDaneDpmto,
       CodigoDaneMunicipio,
       Departamento,
       Municipio,
+      Servicio,
       Direccion,
+      ViaPrincipalClave,
+      ViaPrincipalValor,
+      ViaSecundariaClave,
+      ViaSecundariaValor,
+      ViaSecundariaValorDos,
+      TipoUnidadUnoClave,
+      TipoUnidadUnoValor,
+      TipoUnidadDosClave,
+      TipoUnidadDosValor,
       Barrio,
       Anexo,
       Estado_idEstado,
       Estrato_idEstrato,
-      Sexo_idSexo,  // Nuevo campo para sexo
+      Sexo_idSexo,
     } = req.body;
-
+  
     const idAdministrador = req.user.id; // ID del administrador activo (extraído del middleware de autenticación)
-
+  
     // Validar campos obligatorios
     if (
       !Nombre || !Apellido || !TipoDocumento_idTipoDocumento || !NumeroDocumento ||
@@ -44,44 +58,56 @@ const registerBeneficiaryController = {
     ) {
       return res.status(400).json({ message: 'Todos los campos obligatorios deben ser proporcionados' });
     }
-
+  
     try {
       // Verificar si el NumeroDocumento ya está registrado
       const existingBeneficiary = await Beneficiario.findOne({
         where: { NumeroDocumento },  // Buscamos un beneficiario con el mismo número de documento
       });
-
+  
       if (existingBeneficiary) {
         return res.status(400).json({
           message: 'El Número de Documento ya está registrado con otro beneficiario.',
         });
       }
-
+  
       // Insertar el beneficiario en la base de datos
       const newBeneficiary = await Beneficiario.create({
+        Contrato: Contrato || null,
         Nombre,
         Apellido,
         TipoDocumento_idTipoDocumento,
         NumeroDocumento,
-        Telefono: Telefono || null,  // Campo opcional
-        Celular: Celular || null,    // Campo opcional
+        Telefono: Telefono || null,
+        Celular: Celular || null,
+        TelefonoTres: TelefonoTres || null,
         Correo,
-        FechaNacimiento,  // Asignar fecha de nacimiento aquí
+        FechaNacimiento: FechaNacimiento || null,
         FechaInicio,
-        FechaFin: FechaFin || null,  // Campo opcional
+        FechaFin: FechaFin || null,
         CodigoDaneDpmto,
         CodigoDaneMunicipio,
-        Departamento: Departamento || null, // Campo opcional
-        Municipio: Municipio || null,     // Campo opcional
+        Departamento: Departamento || null,
+        Municipio: Municipio || null,
+        Servicio: Servicio || null,
         Direccion,
-        Barrio: Barrio || null,        // Campo opcional
-        Anexo: Anexo || null,         // Campo opcional
+        ViaPrincipalClave: ViaPrincipalClave || null,
+        ViaPrincipalValor: ViaPrincipalValor || null,
+        ViaSecundariaClave: ViaSecundariaClave || null,
+        ViaSecundariaValor: ViaSecundariaValor || null,
+        ViaSecundariaValorDos: ViaSecundariaValorDos || null,
+        TipoUnidadUnoClave: TipoUnidadUnoClave || null,
+        TipoUnidadUnoValor: TipoUnidadUnoValor || null,
+        TipoUnidadDosClave: TipoUnidadDosClave || null,
+        TipoUnidadDosValor: TipoUnidadDosValor || null,
+        Barrio: Barrio || null,
+        Anexo: Anexo || null,
         Estado_idEstado,
         Estrato_idEstrato,
-        Sexo_idSexo, // Asignar el sexo aquí
         Administrador_idAdministrador: idAdministrador,
+        Sexo_idSexo: Sexo_idSexo || null,
       });
-
+  
       // Registrar el cambio en HistorialCambio
       await HistorialCambio.create({
         Accion: 'Creación',
@@ -90,7 +116,7 @@ const registerBeneficiaryController = {
         Administrador_idAdministrador: idAdministrador,
         Beneficiario_idBeneficiario: newBeneficiary.idBeneficiario,
       });
-
+  
       res.status(201).json({
         message: 'Beneficiario registrado exitosamente',
         newBeneficiaryId: newBeneficiary.idBeneficiario,  // ID del beneficiario recién registrado
@@ -111,17 +137,17 @@ const registerBeneficiaryController = {
         include: [
           {
             model: Estado,
-            attributes: ['idEstado', 'Estado'],  // Incluimos el id
+            attributes: ['idEstado', 'Estado'],
             as: 'estado',
           },
           {
             model: Estrato,
-            attributes: ['idEstrato', 'Estrato'],  // Incluimos el id
+            attributes: ['idEstrato', 'Estrato'],
             as: 'estrato',
           },
           {
             model: TipoDocumento,
-            attributes: ['idTipoDocumento', 'TipoDocumento'],  // Incluimos el id
+            attributes: ['idTipoDocumento', 'TipoDocumento'],
             as: 'tipoDocumento',
           },
           {
@@ -131,13 +157,13 @@ const registerBeneficiaryController = {
           },
           {
             model: Sexo,
-            attributes: ['idSexo', 'Sexo'],  // Incluimos el id
+            attributes: ['idSexo', 'Sexo'],
             as: 'sexo',
           },
           {
-            model: Documento,  // Aquí incluimos los documentos relacionados
-            attributes: ['idDocumentos', 'NombreDocumento', 'TipoDocumento', 'Url'],  // Traemos los atributos de los documentos
-            as: 'documentos',  // Alias de la relación
+            model: Documento,
+            attributes: ['idDocumentos', 'NombreDocumento', 'TipoDocumento', 'Url'],
+            as: 'documentos',
           },
         ],
       });
@@ -148,6 +174,7 @@ const registerBeneficiaryController = {
   
       const formattedBeneficiaries = beneficiaries.map(beneficiary => ({
         idBeneficiario: beneficiary.idBeneficiario,
+        Contrato: beneficiary.Contrato, // Nuevo campo
         Nombre: beneficiary.Nombre,
         Apellido: beneficiary.Apellido,
         TipoDocumento: beneficiary.tipoDocumento ? {
@@ -157,11 +184,8 @@ const registerBeneficiaryController = {
         NumeroDocumento: beneficiary.NumeroDocumento,
         Telefono: beneficiary.Telefono,
         Celular: beneficiary.Celular,
+        TelefonoTres: beneficiary.TelefonoTres, // Nuevo campo
         Correo: beneficiary.Correo,
-        Estrato: beneficiary.estrato ? {
-          id: beneficiary.estrato.idEstrato,
-          nombre: beneficiary.estrato.Estrato
-        } : null,
         FechaNacimiento: beneficiary.FechaNacimiento,
         FechaInicio: beneficiary.FechaInicio,
         FechaFin: beneficiary.FechaFin,
@@ -169,7 +193,17 @@ const registerBeneficiaryController = {
         CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
+        Servicio: beneficiary.Servicio, // Nuevo campo
         Direccion: beneficiary.Direccion,
+        ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
+        ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
+        ViaSecundariaClave: beneficiary.ViaSecundariaClave, // Nuevo campo
+        ViaSecundariaValor: beneficiary.ViaSecundariaValor, // Nuevo campo
+        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos, // Nuevo campo
+        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave, // Nuevo campo
+        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor, // Nuevo campo
+        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave, // Nuevo campo
+        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor, // Nuevo campo
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
         Estado: beneficiary.estado ? {
@@ -187,7 +221,6 @@ const registerBeneficiaryController = {
         },
         CreatedAt: beneficiary.createdAt,
         UpdatedAt: beneficiary.updatedAt,
-        // Aquí agregamos los documentos relacionados
         Documentos: beneficiary.documentos.map(doc => ({
           idDocumentos: doc.idDocumentos,
           NombreDocumento: doc.NombreDocumento,
@@ -255,6 +288,7 @@ const registerBeneficiaryController = {
   
       const formattedBeneficiary = {
         idBeneficiario: beneficiary.idBeneficiario,
+        Contrato: beneficiary.Contrato, // Nuevo campo
         Nombre: beneficiary.Nombre,
         Apellido: beneficiary.Apellido,
         TipoDocumento: beneficiary.tipoDocumento ? {
@@ -264,11 +298,8 @@ const registerBeneficiaryController = {
         NumeroDocumento: beneficiary.NumeroDocumento,
         Telefono: beneficiary.Telefono,
         Celular: beneficiary.Celular,
+        TelefonoTres: beneficiary.TelefonoTres, // Nuevo campo
         Correo: beneficiary.Correo,
-        Estrato: beneficiary.estrato ? {
-          id: beneficiary.estrato.idEstrato,
-          nombre: beneficiary.estrato.Estrato,
-        } : null,
         FechaNacimiento: beneficiary.FechaNacimiento,
         FechaInicio: beneficiary.FechaInicio,
         FechaFin: beneficiary.FechaFin,
@@ -276,7 +307,17 @@ const registerBeneficiaryController = {
         CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
+        Servicio: beneficiary.Servicio, // Nuevo campo
         Direccion: beneficiary.Direccion,
+        ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
+        ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
+        ViaSecundariaClave: beneficiary.ViaSecundariaClave, // Nuevo campo
+        ViaSecundariaValor: beneficiary.ViaSecundariaValor, // Nuevo campo
+        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos, // Nuevo campo
+        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave, // Nuevo campo
+        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor, // Nuevo campo
+        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave, // Nuevo campo
+        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor, // Nuevo campo
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
         Estado: beneficiary.estado ? {
@@ -294,7 +335,6 @@ const registerBeneficiaryController = {
         },
         CreatedAt: beneficiary.createdAt,
         UpdatedAt: beneficiary.updatedAt,
-        // Aquí agregamos los documentos relacionados
         Documentos: beneficiary.documentos.map(doc => ({
           idDocumentos: doc.idDocumentos,
           NombreDocumento: doc.NombreDocumento,
@@ -363,6 +403,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
 
     const formattedBeneficiary = {
       idBeneficiario: beneficiary.idBeneficiario,
+      Contrato: beneficiary.Contrato, // Nuevo campo
       Nombre: beneficiary.Nombre,
       Apellido: beneficiary.Apellido,
       TipoDocumento: beneficiary.tipoDocumento ? {
@@ -372,11 +413,8 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       NumeroDocumento: beneficiary.NumeroDocumento,
       Telefono: beneficiary.Telefono,
       Celular: beneficiary.Celular,
+      TelefonoTres: beneficiary.TelefonoTres, // Nuevo campo
       Correo: beneficiary.Correo,
-      Estrato: beneficiary.estrato ? {
-        id: beneficiary.estrato.idEstrato,
-        nombre: beneficiary.estrato.Estrato,
-      } : null,
       FechaNacimiento: beneficiary.FechaNacimiento,
       FechaInicio: beneficiary.FechaInicio,
       FechaFin: beneficiary.FechaFin,
@@ -384,7 +422,17 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
       Departamento: beneficiary.Departamento,
       Municipio: beneficiary.Municipio,
+      Servicio: beneficiary.Servicio, // Nuevo campo
       Direccion: beneficiary.Direccion,
+      ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
+      ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
+      ViaSecundariaClave: beneficiary.ViaSecundariaClave, // Nuevo campo
+      ViaSecundariaValor: beneficiary.ViaSecundariaValor, // Nuevo campo
+      ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos, // Nuevo campo
+      TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave, // Nuevo campo
+      TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor, // Nuevo campo
+      TipoUnidadDosClave: beneficiary.TipoUnidadDosClave, // Nuevo campo
+      TipoUnidadDosValor: beneficiary.TipoUnidadDosValor, // Nuevo campo
       Barrio: beneficiary.Barrio,
       Anexo: beneficiary.Anexo,
       Estado: beneficiary.estado ? {
@@ -402,7 +450,6 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       },
       CreatedAt: beneficiary.createdAt,
       UpdatedAt: beneficiary.updatedAt,
-      // Aquí agregamos los documentos relacionados
       Documentos: beneficiary.documentos.map(doc => ({
         idDocumentos: doc.idDocumentos,
         NombreDocumento: doc.NombreDocumento,
@@ -423,7 +470,6 @@ async getBeneficiaryByNumeroDocumento(req, res) {
     });
   }
 },
-
   // Actualizar un beneficiario
   async updateBeneficiary(req, res) {
     const { id } = req.params;
@@ -448,6 +494,18 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Estado_idEstado,
       Estrato_idEstrato,
       Sexo_idSexo, // Nuevo campo para sexo
+      Contrato, // Nuevo campo para contrato
+      TelefonoTres, // Nuevo campo para teléfono adicional
+      Servicio, // Nuevo campo para servicio
+      ViaPrincipalClave, // Nuevos campos de dirección
+      ViaPrincipalValor,
+      ViaSecundariaClave,
+      ViaSecundariaValor,
+      ViaSecundariaValorDos,
+      TipoUnidadUnoClave,
+      TipoUnidadUnoValor,
+      TipoUnidadDosClave,
+      TipoUnidadDosValor,
     } = req.body;
   
     const idAdministrador = req.user.id; // ID del administrador activo (extraído del middleware de autenticación)
@@ -491,6 +549,18 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         Estado_idEstado: beneficiary.Estado_idEstado,
         Estrato_idEstrato: beneficiary.Estrato_idEstrato,
         Sexo_idSexo: beneficiary.Sexo_idSexo,
+        Contrato: beneficiary.Contrato, // Incluir el historial del contrato
+        TelefonoTres: beneficiary.TelefonoTres, // Incluir el historial de teléfono adicional
+        Servicio: beneficiary.Servicio, // Incluir historial de servicio
+        ViaPrincipalClave: beneficiary.ViaPrincipalClave,
+        ViaPrincipalValor: beneficiary.ViaPrincipalValor,
+        ViaSecundariaClave: beneficiary.ViaSecundariaClave,
+        ViaSecundariaValor: beneficiary.ViaSecundariaValor,
+        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos,
+        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave,
+        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor,
+        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave,
+        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
       };
   
       // Actualizar el beneficiario
@@ -514,6 +584,20 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       beneficiary.Estado_idEstado = Estado_idEstado || beneficiary.Estado_idEstado;
       beneficiary.Estrato_idEstrato = Estrato_idEstrato || beneficiary.Estrato_idEstrato;
       beneficiary.Sexo_idSexo = Sexo_idSexo || beneficiary.Sexo_idSexo;  // Actualizar el sexo aquí
+  
+      // Nuevos campos
+      beneficiary.Contrato = Contrato || beneficiary.Contrato;
+      beneficiary.TelefonoTres = TelefonoTres || beneficiary.TelefonoTres;
+      beneficiary.Servicio = Servicio || beneficiary.Servicio;
+      beneficiary.ViaPrincipalClave = ViaPrincipalClave || beneficiary.ViaPrincipalClave;
+      beneficiary.ViaPrincipalValor = ViaPrincipalValor || beneficiary.ViaPrincipalValor;
+      beneficiary.ViaSecundariaClave = ViaSecundariaClave || beneficiary.ViaSecundariaClave;
+      beneficiary.ViaSecundariaValor = ViaSecundariaValor || beneficiary.ViaSecundariaValor;
+      beneficiary.ViaSecundariaValorDos = ViaSecundariaValorDos || beneficiary.ViaSecundariaValorDos;
+      beneficiary.TipoUnidadUnoClave = TipoUnidadUnoClave || beneficiary.TipoUnidadUnoClave;
+      beneficiary.TipoUnidadUnoValor = TipoUnidadUnoValor || beneficiary.TipoUnidadUnoValor;
+      beneficiary.TipoUnidadDosClave = TipoUnidadDosClave || beneficiary.TipoUnidadDosClave;
+      beneficiary.TipoUnidadDosValor = TipoUnidadDosValor || beneficiary.TipoUnidadDosValor;
   
       // Guardar cambios
       await beneficiary.save();
@@ -542,39 +626,75 @@ async getBeneficiaryByNumeroDocumento(req, res) {
 
   // Eliminar un beneficiario
   async deleteBeneficiary(req, res) {
-  const { id } = req.params;
-  const idAdministrador = req.user.id; // ID del administrador activo (extraído del middleware de autenticación)
-
-  try {
-    const beneficiary = await Beneficiario.findByPk(id);
-
-    if (!beneficiary) {
-      return res.status(404).json({ message: 'Beneficiario no encontrado' });
+    const { id } = req.params;
+    const idAdministrador = req.user.id; // ID del administrador activo (extraído del middleware de autenticación)
+  
+    try {
+      // Buscar al beneficiario por su ID
+      const beneficiary = await Beneficiario.findByPk(id);
+  
+      if (!beneficiary) {
+        return res.status(404).json({ message: 'Beneficiario no encontrado' });
+      }
+  
+      // Eliminar los documentos asociados al beneficiario antes de eliminar al beneficiario
+      const documentos = await Documento.findAll({
+        where: { Beneficiario_idBeneficiario: id }
+      });
+  
+      // Si existen documentos, eliminarlos
+      if (documentos.length > 0) {
+        for (const doc of documentos) {
+          // Obtener la ruta física del archivo
+          const filePath = path.resolve(__dirname, '../..', doc.Url.replace(/^http:\/\/localhost:\d+\//, ''));
+  
+          // Intentar eliminar el archivo físico del sistema
+          try {
+            await fs.access(filePath); // Verifica si el archivo existe
+            await fs.unlink(filePath); // Elimina el archivo físico
+            console.log(`Archivo eliminado: ${filePath}`);
+          } catch (err) {
+            console.error(`Error al intentar eliminar el archivo: ${filePath}`, err.message);
+            // Continuar con la eliminación aunque no se pueda eliminar el archivo
+          }
+  
+          // Eliminar el documento de la base de datos
+          await doc.destroy();
+  
+          // Registrar el cambio en HistorialCambio para la eliminación de cada documento
+          await HistorialCambio.create({
+            Accion: 'Eliminación',
+            ValorAnterior: JSON.stringify(doc),
+            ValorNuevo: 'N/A',
+            Administrador_idAdministrador: idAdministrador,
+            Beneficiario_idBeneficiario: doc.Beneficiario_idBeneficiario,
+          });
+        }
+      }
+  
+      // Registrar el cambio en HistorialCambio antes de eliminar al beneficiario
+      await HistorialCambio.create({
+        Accion: 'Eliminación',
+        ValorAnterior: JSON.stringify(beneficiary), // Guardamos los datos del beneficiario antes de eliminarlo
+        ValorNuevo: 'N/A', // En la eliminación, no hay nuevo valor
+        Administrador_idAdministrador: idAdministrador,
+        Beneficiario_idBeneficiario: beneficiary.idBeneficiario,
+      });
+  
+      // Eliminar el beneficiario
+      await beneficiary.destroy();
+  
+      res.status(200).json({
+        message: 'Beneficiario y sus documentos eliminados exitosamente',
+      });
+    } catch (err) {
+      console.error('Error al eliminar el beneficiario:', err);
+      res.status(500).json({
+        message: 'Error al eliminar el beneficiario',
+        error: err.message,
+      });
     }
-
-    // Registrar el cambio en HistorialCambio antes de eliminar
-    await HistorialCambio.create({
-      Accion: 'Eliminación',
-      ValorAnterior: JSON.stringify(beneficiary), // Guardamos los datos del beneficiario antes de eliminarlo
-      ValorNuevo: 'N/A', // En la eliminación, no hay nuevo valor
-      Administrador_idAdministrador: idAdministrador,
-      Beneficiario_idBeneficiario: beneficiary.idBeneficiario,
-    });
-
-    // Eliminar el beneficiario
-    await beneficiary.destroy();
-
-    res.status(200).json({
-      message: 'Beneficiario eliminado exitosamente',
-    });
-  } catch (err) {
-    console.error('Error al eliminar el beneficiario:', err);
-    res.status(500).json({
-      message: 'Error al eliminar el beneficiario',
-      error: err.message,
-    });
-  }
-},
+  },
 };
 
 module.exports = registerBeneficiaryController;
