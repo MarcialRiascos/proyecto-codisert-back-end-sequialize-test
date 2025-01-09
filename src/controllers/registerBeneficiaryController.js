@@ -645,8 +645,10 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       // Si existen documentos, eliminarlos
       if (documentos.length > 0) {
         for (const doc of documentos) {
-          // Obtener la ruta física del archivo
-          const relativePath = doc.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Eliminar el prefijo si está presente
+          // Obtener la ruta relativa del archivo desde la URL completa
+          const relativePath = doc.Url.replace(/^https?:\/\/[^\/]+/, ''); // Eliminar el host completo de la URL
+  
+          // Ahora 'relativePath' contiene solo la ruta relativa del archivo
           const filePath = path.resolve(__dirname, '../..', relativePath); // Construir la ruta absoluta en el servidor
   
           // Intentar eliminar el archivo físico del sistema
