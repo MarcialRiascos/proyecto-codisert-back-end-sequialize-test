@@ -1,0 +1,356 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema proyecto_codisert
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema proyecto_codisert
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `proyecto_codisert` DEFAULT CHARACTER SET utf8 ;
+USE `proyecto_codisert` ;
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Estado`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Estado` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Estado` (
+  `idEstado` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Estado` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idEstado`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Estrato`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Estrato` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Estrato` (
+  `idEstrato` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Estrato` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idEstrato`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Rol`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Rol` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Rol` (
+  `idRol` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Rol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idRol`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`TipoDocumento`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`TipoDocumento` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`TipoDocumento` (
+  `idTipoDocumento` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `TipoDocumento` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTipoDocumento`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Sexo`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Sexo` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Sexo` (
+  `idSexo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Sexo` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idSexo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Administrador`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Administrador` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Administrador` (
+  `idAdministrador` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(45) NOT NULL,
+  `Apellido` VARCHAR(45) NOT NULL,
+  `TipoDocumento_idTipoDocumento` INT UNSIGNED NOT NULL,
+  `NumeroDocumento` VARCHAR(45) NOT NULL,
+  `Telefono` VARCHAR(45) NULL,
+  `Correo` VARCHAR(45) NOT NULL,
+  `Password` VARCHAR(255) NOT NULL,
+  `Estado_idEstado` INT UNSIGNED NOT NULL,
+  `Rol_idRol` INT UNSIGNED NOT NULL,
+  `Administrador_idAdministrador` INT NULL,
+  `Sexo_idSexo` INT UNSIGNED NOT NULL,
+  INDEX `fk_Persona_Estado1_idx` (`Estado_idEstado` ASC),
+  INDEX `fk_Administrador_Rol1_idx` (`Rol_idRol` ASC),
+  INDEX `fk_Administrador_TipoDocumento1_idx` (`TipoDocumento_idTipoDocumento` ASC),
+  PRIMARY KEY (`idAdministrador`),
+  UNIQUE INDEX `NumeroDocumento_UNIQUE` (`NumeroDocumento` ASC),
+  INDEX `fk_Administrador_Sexo1_idx` (`Sexo_idSexo` ASC),
+  CONSTRAINT `fk_Persona_Estado10`
+    FOREIGN KEY (`Estado_idEstado`)
+    REFERENCES `proyecto_codisert`.`Estado` (`idEstado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Administrador_Rol1`
+    FOREIGN KEY (`Rol_idRol`)
+    REFERENCES `proyecto_codisert`.`Rol` (`idRol`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Administrador_TipoDocumento1`
+    FOREIGN KEY (`TipoDocumento_idTipoDocumento`)
+    REFERENCES `proyecto_codisert`.`TipoDocumento` (`idTipoDocumento`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Administrador_Sexo1`
+    FOREIGN KEY (`Sexo_idSexo`)
+    REFERENCES `proyecto_codisert`.`Sexo` (`idSexo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Beneficiario`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Beneficiario` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Beneficiario` (
+  `idBeneficiario` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Contrato` VARCHAR(45) NULL,
+  `Nombre` VARCHAR(45) NOT NULL,
+  `Apellido` VARCHAR(45) NOT NULL,
+  `TipoDocumento_idTipoDocumento` INT UNSIGNED NOT NULL,
+  `NumeroDocumento` VARCHAR(45) NOT NULL,
+  `Telefono` VARCHAR(45) NULL,
+  `Celular` VARCHAR(45) NULL,
+  `TelefonoTres` VARCHAR(45) NULL,
+  `Correo` VARCHAR(45) NULL,
+  `FechaNacimiento` DATE NOT NULL,
+  `FechaInicio` DATE NOT NULL,
+  `FechaFin` DATE NULL,
+  `CodigoDaneDpmto` VARCHAR(45) NOT NULL,
+  `Departamento` VARCHAR(45) NOT NULL,
+  `CodigoDaneMunicipio` VARCHAR(45) NOT NULL,
+  `Municipio` VARCHAR(45) NOT NULL,
+  `Servicio` VARCHAR(45) NULL,
+  `Direccion` VARCHAR(45) NOT NULL,
+  `ViaPrincipalClave` VARCHAR(45) NULL,
+  `ViaPrincipalValor` VARCHAR(45) NULL,
+  `ViaSecundariaClave` VARCHAR(45) NULL,
+  `ViaSecundariaValor` VARCHAR(45) NULL,
+  `ViaSecundariaValorDos` VARCHAR(45) NULL,
+  `TipoUnidadUnoClave` VARCHAR(45) NULL,
+  `TipoUnidadUnoValor` VARCHAR(45) NULL,
+  `TipoUnidadDosClave` VARCHAR(45) NULL,
+  `TipoUnidadDosValor` VARCHAR(45) NULL,
+  `Barrio` VARCHAR(45) NULL,
+  `Anexo` VARCHAR(255) NULL,
+  `Estado_idEstado` INT UNSIGNED NOT NULL,
+  `Estrato_idEstrato` INT UNSIGNED NOT NULL,
+  `Administrador_idAdministrador` INT UNSIGNED NOT NULL,
+  `Sexo_idSexo` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`idBeneficiario`),
+  INDEX `fk_Persona_Estado1_idx` (`Estado_idEstado` ASC),
+  INDEX `fk_Persona_Estrato1_idx` (`Estrato_idEstrato` ASC),
+  INDEX `fk_Beneficiario_Administrador1_idx` (`Administrador_idAdministrador` ASC),
+  INDEX `fk_Beneficiario_TipoDocumento1_idx` (`TipoDocumento_idTipoDocumento` ASC),
+  INDEX `fk_Beneficiario_Sexo1_idx` (`Sexo_idSexo` ASC),
+  UNIQUE INDEX `Contrato_UNIQUE` (`Contrato` ASC),
+  CONSTRAINT `fk_Persona_Estado1`
+    FOREIGN KEY (`Estado_idEstado`)
+    REFERENCES `proyecto_codisert`.`Estado` (`idEstado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Persona_Estrato1`
+    FOREIGN KEY (`Estrato_idEstrato`)
+    REFERENCES `proyecto_codisert`.`Estrato` (`idEstrato`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Beneficiario_Administrador1`
+    FOREIGN KEY (`Administrador_idAdministrador`)
+    REFERENCES `proyecto_codisert`.`Administrador` (`idAdministrador`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Beneficiario_TipoDocumento1`
+    FOREIGN KEY (`TipoDocumento_idTipoDocumento`)
+    REFERENCES `proyecto_codisert`.`TipoDocumento` (`idTipoDocumento`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Beneficiario_Sexo1`
+    FOREIGN KEY (`Sexo_idSexo`)
+    REFERENCES `proyecto_codisert`.`Sexo` (`idSexo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Documentos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Documentos` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Documentos` (
+  `idDocumentos` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `NombreDocumento` VARCHAR(45) NOT NULL,
+  `TipoDocumento` VARCHAR(255) NOT NULL,
+  `Url` VARCHAR(255) NOT NULL,
+  `Beneficiario_idBeneficiario` INT UNSIGNED NOT NULL,
+  `Administrador_idAdministrador` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`idDocumentos`),
+  INDEX `fk_Dcumentos_Administrador1_idx` (`Administrador_idAdministrador` ASC),
+  INDEX `fk_Dcumentos_Beneficiario1_idx` (`Beneficiario_idBeneficiario` ASC),
+  CONSTRAINT `fk_Dcumentos_Administrador1`
+    FOREIGN KEY (`Administrador_idAdministrador`)
+    REFERENCES `proyecto_codisert`.`Administrador` (`idAdministrador`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Dcumentos_Beneficiario1`
+    FOREIGN KEY (`Beneficiario_idBeneficiario`)
+    REFERENCES `proyecto_codisert`.`Beneficiario` (`idBeneficiario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`HistorialCambio`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`HistorialCambio` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`HistorialCambio` (
+  `idHistorialCambio` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Accion` VARCHAR(45) NOT NULL,
+  `ValorAnterior` TEXT NOT NULL,
+  `ValorNuevo` TEXT NULL,
+  `Administrador_idAdministrador` INT UNSIGNED NOT NULL,
+  `Beneficiario_idBeneficiario` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`idHistorialCambio`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Via`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Via` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Via` (
+  `idVia` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Via` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idVia`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`TipoUnidad`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`TipoUnidad` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`TipoUnidad` (
+  `idTipoUnidad` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `TipoUnidad` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTipoUnidad`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Barrio`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Barrio` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Barrio` (
+  `idBarrio` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Barrio` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idBarrio`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Facturacion`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Facturacion` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Facturacion` (
+  `idFacturacion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `NombreDocumento` VARCHAR(45) NOT NULL,
+  `Url` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idFacturacion`))
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- Para la tabla administrador
+ALTER TABLE `administrador`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla barrio
+ALTER TABLE `barrio`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla beneficiario
+ALTER TABLE `beneficiario`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla documentos
+ALTER TABLE `documentos`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla estado
+ALTER TABLE `estado`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla estrato
+ALTER TABLE `estrato`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla facturacion
+ALTER TABLE `facturacion`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla historialcambio
+ALTER TABLE `historialcambio`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla rol
+ALTER TABLE `rol`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla sexo
+ALTER TABLE `sexo`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla tipodocumento
+ALTER TABLE `tipodocumento`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla tipounidad
+ALTER TABLE `tipounidad`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
+
+-- Para la tabla via
+ALTER TABLE `via`
+  ADD COLUMN `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  ADD COLUMN `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP();
