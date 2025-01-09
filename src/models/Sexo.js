@@ -10,6 +10,7 @@ const Sexo = sequelize.define('Sexo', {
   Sexo: {
     type: DataTypes.STRING(45),
     allowNull: false,
+    unique: true,
   },
 }, {
   tableName: 'sexo', // Asegúrate de que coincida con el nombre de la tabla en la base de datos

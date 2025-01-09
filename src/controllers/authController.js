@@ -45,9 +45,9 @@ const authController = {
         user: {
           id: user.idAdministrador,
           name: user.Nombre,
-          lastname: user.Apellido, // Asegúrate de que la columna 'Apellido' exista en el modelo
+          lastname: user.Apellido, 
           email: user.Correo,
-          role: role.Rol, // Incluyendo el rol
+          role: role.Rol, 
         },
       });
 

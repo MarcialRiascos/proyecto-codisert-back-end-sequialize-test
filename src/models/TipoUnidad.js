@@ -10,6 +10,7 @@ const TipoUnidad = sequelize.define('TipoUnidad', {
   TipoUnidad: {
     type: DataTypes.STRING(45),
     allowNull: false,
+    unique: true,
   },
 }, {
   tableName: 'tipounidad',  

@@ -10,7 +10,8 @@ const TipoDocumento = sequelize.define('TipoDocumento', {
   },
   TipoDocumento: {
     type: DataTypes.STRING(45),
-    allowNull: false
+    allowNull: false,
+    unique: true,
   }
 }, {
   tableName: 'tipodocumento',  // El nombre de la tabla en la base de datos

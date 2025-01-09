@@ -10,6 +10,7 @@ const Via = sequelize.define('Via', {
   Via: {
     type: DataTypes.STRING(45),
     allowNull: false,
+    unique: true,
   },
 }, {
   tableName: 'via',  

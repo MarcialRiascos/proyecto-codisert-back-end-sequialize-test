@@ -251,6 +251,42 @@ const registerAdminController = {
       });
     }
   },
+
+  async changePassword(req, res) {
+    const { oldPassword, newPassword } = req.body;
+    const idAdministrador = req.user.id; // ID del usuario con sesión activa
+
+    // Validar que ambos campos estén presentes
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Se deben proporcionar la contraseña actual y la nueva.' });
+    }
+
+    try {
+      // Buscar al administrador actual
+      const admin = await Administrador.findByPk(idAdministrador);
+      if (!admin) {
+        return res.status(404).json({ message: 'Administrador no encontrado' });
+      }
+
+      // Comparar la contraseña actual con la almacenada
+      const isMatch = await bcrypt.compare(oldPassword, admin.Password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
+      }
+
+      // Encriptar la nueva contraseña
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Actualizar la contraseña del administrador
+      admin.Password = hashedNewPassword;
+      await admin.save();
+
+      res.status(200).json({ message: 'Contraseña actualizada exitosamente' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error al cambiar la contraseña', error: err.message });
+    }
+  },
 };
 
 module.exports = registerAdminController;

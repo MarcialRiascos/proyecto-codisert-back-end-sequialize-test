@@ -8,5 +8,6 @@ router.get('/search-alls', authAdminMiddleware, UserController.getAllAdmins);
 router.get('/search/:id', authAdminMiddleware, UserController.getAdminById);
 router.put('/update/:id', authAdminMiddleware, UserController.updateAdmin);
 router.delete('/delete/:id', authAdminMiddleware, UserController.deleteAdmin);
+router.post('/change-password', authAdminMiddleware, UserController.changePassword);
 
 module.exports = router;
