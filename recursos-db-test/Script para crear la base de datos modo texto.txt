@@ -20,9 +20,9 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Estado` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Estado` (
   `idEstado` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Estado` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idEstado`))
+  PRIMARY KEY (`idEstado`),
+  UNIQUE INDEX `Estado_UNIQUE` (`Estado` ASC))
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_codisert`.`Estrato`
@@ -32,9 +32,9 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Estrato` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Estrato` (
   `idEstrato` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Estrato` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idEstrato`))
+  PRIMARY KEY (`idEstrato`),
+  UNIQUE INDEX `Estrato_UNIQUE` (`Estrato` ASC))
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_codisert`.`Rol`
@@ -44,9 +44,9 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Rol` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Rol` (
   `idRol` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Rol` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idRol`))
+  PRIMARY KEY (`idRol`),
+  UNIQUE INDEX `Rol_UNIQUE` (`Rol` ASC))
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_codisert`.`TipoDocumento`
@@ -56,9 +56,9 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`TipoDocumento` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`TipoDocumento` (
   `idTipoDocumento` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `TipoDocumento` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idTipoDocumento`))
+  PRIMARY KEY (`idTipoDocumento`),
+  UNIQUE INDEX `TipoDocumento_UNIQUE` (`TipoDocumento` ASC))
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_codisert`.`Sexo`
@@ -68,9 +68,9 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Sexo` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Sexo` (
   `idSexo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Sexo` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idSexo`))
+  PRIMARY KEY (`idSexo`),
+  UNIQUE INDEX `Sexo_UNIQUE` (`Sexo` ASC))
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `proyecto_codisert`.`Administrador`
@@ -245,7 +245,8 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Via` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Via` (
   `idVia` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Via` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idVia`))
+  PRIMARY KEY (`idVia`),
+  UNIQUE INDEX `Via_UNIQUE` (`Via` ASC))
 ENGINE = InnoDB;
 
 
@@ -257,7 +258,8 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`TipoUnidad` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`TipoUnidad` (
   `idTipoUnidad` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `TipoUnidad` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idTipoUnidad`))
+  PRIMARY KEY (`idTipoUnidad`),
+  UNIQUE INDEX `TipoUnidad_UNIQUE` (`TipoUnidad` ASC))
 ENGINE = InnoDB;
 
 
@@ -269,7 +271,8 @@ DROP TABLE IF EXISTS `proyecto_codisert`.`Barrio` ;
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Barrio` (
   `idBarrio` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Barrio` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idBarrio`))
+  PRIMARY KEY (`idBarrio`),
+  UNIQUE INDEX `Barrio_UNIQUE` (`Barrio` ASC))
 ENGINE = InnoDB;
 
 
