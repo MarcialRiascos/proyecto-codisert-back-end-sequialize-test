@@ -646,7 +646,8 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       if (documentos.length > 0) {
         for (const doc of documentos) {
           // Intentar eliminar el archivo físico del sistema
-          const filePath = path.resolve(__dirname, '..', '..', 'uploads', doc.Url); // Usamos 'uploads' como directorio base
+          const filePath = path.resolve(__dirname, '..', '..',  doc.Url.replace(/^http:\/\/localhost:\d+\//, ''));
+          // const filePath = path.resolve(__dirname, '..', '..', doc.Url); // Usamos 'uploads' como directorio base
           try {
             await fs.access(filePath); // Verifica si el archivo existe
             await fs.unlink(filePath); // Elimina el archivo físico

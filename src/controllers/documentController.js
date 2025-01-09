@@ -62,7 +62,7 @@ const registerDocumentController = {
           }
   
           // Formar la URL completa
-          const urlDocumento = `${carpetaDocumento}/${file.filename}`;
+          const urlDocumento = `uploads/${carpetaDocumento}/${file.filename}`;
   
           // Aquí puedes agregar validaciones de tipo de archivo y tamaño si es necesario
           const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'application/msword']; // Agregar los tipos permitidos
