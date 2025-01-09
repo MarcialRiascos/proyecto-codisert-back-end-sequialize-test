@@ -23,8 +23,7 @@ const Documento = sequelize.define('Documento', {
     get() {
       const url = this.getDataValue('Url');  // Obtén el valor del campo 'url'
       const host = process.env.HOST_URL_PROD || 'https://proyecto-codisert-back-end-sequialize.onrender.com/';  // Usa la variable de entorno o un valor predeterminado
-      // Devolver la URL completa solo cuando se consulta (para mostrar o descargar el archivo)
-      return url ? `${host}${url}` : null;
+      return url ? `${host}${url}` : null;  // Devuelve la URL completa
     },
   },
   Beneficiario_idBeneficiario: {
