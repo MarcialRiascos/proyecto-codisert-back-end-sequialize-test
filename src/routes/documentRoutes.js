@@ -9,13 +9,13 @@ const router = express.Router();
 
 // Ruta para cargar documentos (usamos el middleware de multer)
 router.post('/upload/:idBeneficiario', authAdminRegisMiddleware, upload.fields([
-    { name: 'Copia del Contrato de Prestación de Servicios', maxCount: 1 },
-    { name: 'Copia del documento de identidad del Usuario', maxCount: 1 },
-    { name: 'Copia de la declaración del suscriptor', maxCount: 1 },
-    { name: 'Foto de la fachada del predio del Usuario', maxCount: 1 },
-    { name: 'Pantallazo de la prueba de velocidad del internet', maxCount: 1 },
-    { name: 'Fotografía del número serial del equipo CPE instalado', maxCount: 1 }/* ,
-    { name: 'recibo', maxCount: 1 } */
+    { name: 'contrato', maxCount: 1 },
+    { name: 'dni', maxCount: 1 },
+    { name: 'declaracion', maxCount: 1 },
+    { name: 'fachada', maxCount: 1 },
+    { name: 'test', maxCount: 1 },
+    { name: 'serial', maxCount: 1 },
+    { name: 'recibo', maxCount: 1 }
   ]), uploadDocument);
 router.get('/search-alls', authAdminRegisLectMiddleware, UsarController.getAllDocuments);
 router.get('/search/:idDocumentos', authAdminRegisLectMiddleware, UsarController.getDocumentById);

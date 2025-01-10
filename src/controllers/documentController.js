@@ -29,7 +29,7 @@ const registerDocumentController = {
         fachada: 'fachadas',
         test: 'tests',
         serial: 'seriales',
-       /*  recibo: 'recibos', */
+        recibo: 'recibos',
       };
   
       // Variable para controlar si se debe responder ya
