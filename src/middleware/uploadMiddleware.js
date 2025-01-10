@@ -14,27 +14,27 @@ const storage = multer.diskStorage({
 
     // Crear subcarpetas según el 'fieldname' (nombre del archivo)
     switch (fieldName) {
-      case 'contrato':
+      case 'Copia del Contrato de Prestación de Servicios':
         uploadPath = path.join(uploadPath, 'contratos');
         break;
-      case 'dni':
+      case 'Copia del documento de identidad del Usuario':
         uploadPath = path.join(uploadPath, 'dnis');
         break;
-      case 'declaracion':
+      case 'Copia de la declaración del suscriptor':
         uploadPath = path.join(uploadPath, 'declaraciones');
         break;
-      case 'fachada':
+      case 'Foto de la fachada del predio del Usuario':
         uploadPath = path.join(uploadPath, 'fachadas');
         break;
-      case 'test':
+      case 'Pantallazo de la prueba de velocidad del internet':
         uploadPath = path.join(uploadPath, 'tests');
         break;
       case 'serial':
-        uploadPath = path.join(uploadPath, 'seriales');
+        uploadPath = path.join(uploadPath, 'Fotografía del número serial del equipo CPE instalado');
         break;
-      case 'recibo':
+      /* case 'recibo':
         uploadPath = path.join(uploadPath, 'recibos');
-        break;
+        break; */
       default:
         uploadPath = path.join(uploadPath, 'otros'); // Para documentos no clasificados
         break;
