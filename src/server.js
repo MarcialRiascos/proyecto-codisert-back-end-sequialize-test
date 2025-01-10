@@ -54,7 +54,7 @@ app.use('/uploads/declaraciones', express.static(path.join(__dirname, '../upload
 app.use('/uploads/fachadas', express.static(path.join(__dirname, '../uploads/fachadas')));
 app.use('/uploads/tests', express.static(path.join(__dirname, '../uploads/tests')));
 app.use('/uploads/seriales', express.static(path.join(__dirname, '../uploads/seriales')));
-/* app.use('/uploads/recibos', express.static(path.join(__dirname, '../uploads/recibos'))); */
+app.use('/uploads/recibos', express.static(path.join(__dirname, '../uploads/recibos')));
 
 // Rutas
 app.use('/auth', authRoutes);
