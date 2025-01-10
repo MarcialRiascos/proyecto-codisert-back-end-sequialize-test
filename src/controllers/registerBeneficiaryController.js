@@ -214,6 +214,10 @@ const registerBeneficiaryController = {
           id: beneficiary.sexo.idSexo,
           nombre: beneficiary.sexo.Sexo
         } : null,
+        Estrato: beneficiary.estrato ? {
+          id: beneficiary.estrato.idEstrato,
+          nombre: beneficiary.estrato.Estrato
+        } : null, // Aquí añadimos el estrato
         Administrador: {
           idAdministrador: beneficiary.administrador ? beneficiary.administrador.idAdministrador : null,
           Nombre: beneficiary.administrador ? beneficiary.administrador.Nombre : null,
@@ -328,6 +332,10 @@ const registerBeneficiaryController = {
           id: beneficiary.sexo.idSexo,
           nombre: beneficiary.sexo.Sexo,
         } : null,
+        Estrato: beneficiary.estrato ? {
+          id: beneficiary.estrato.idEstrato,
+          nombre: beneficiary.estrato.Estrato,
+        } : null, // Aquí añadimos el estrato
         Administrador: {
           idAdministrador: beneficiary.administrador ? beneficiary.administrador.idAdministrador : null,
           Nombre: beneficiary.administrador ? beneficiary.administrador.Nombre : null,
@@ -443,6 +451,10 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         id: beneficiary.sexo.idSexo,
         nombre: beneficiary.sexo.Sexo,
       } : null,
+      Estrato: beneficiary.estrato ? {
+        id: beneficiary.estrato.idEstrato,
+        nombre: beneficiary.estrato.Estrato,
+      } : null, // Aquí añadimos el estrato
       Administrador: {
         idAdministrador: beneficiary.administrador ? beneficiary.administrador.idAdministrador : null,
         Nombre: beneficiary.administrador ? beneficiary.administrador.Nombre : null,
