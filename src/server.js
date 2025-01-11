@@ -32,7 +32,8 @@ const PORT = process.env.PORT || 3000;
 const corsOptions = {
   origin: [
     'https://front-codi-test.vercel.app',
-    'https://proyecto-codisert-frontend.vercel.app'
+    'https://proyecto-codisert-frontend.vercel.app,',
+    'http://localhost:5173'
   ], // URL de tu frontend
   credentials: true, // Permitir cookies y credenciales
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos

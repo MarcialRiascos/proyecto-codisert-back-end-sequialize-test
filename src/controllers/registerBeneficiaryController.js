@@ -61,13 +61,28 @@ const registerBeneficiaryController = {
   
     try {
       // Verificar si el NumeroDocumento ya está registrado
-      const existingBeneficiary = await Beneficiario.findOne({
+      const existingBeneficiaryByDocumento = await Beneficiario.findOne({
         where: { NumeroDocumento },  // Buscamos un beneficiario con el mismo número de documento
       });
   
-      if (existingBeneficiary) {
+      if (existingBeneficiaryByDocumento) {
         return res.status(400).json({
           message: 'El Número de Documento ya está registrado con otro beneficiario.',
+        });
+      }
+  
+      // Verificar si el Contrato ya está registrado (ignorando mayúsculas/minúsculas)
+      const existingBeneficiaryByContrato = await Beneficiario.findOne({
+        where: {
+          Contrato: {
+            [Op.iLike]: Contrato,  // iLike realiza la comparación ignorando mayúsculas y minúsculas (PostgreSQL)
+          },
+        },
+      });
+  
+      if (existingBeneficiaryByContrato) {
+        return res.status(400).json({
+          message: 'El Contrato ya está registrado con otro beneficiario.',
         });
       }
   
@@ -493,7 +508,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Telefono,
       Celular,
       Correo,
-      FechaNacimiento,  // Agregar FechaNacimiento aquí
+      FechaNacimiento,
       FechaInicio,
       FechaFin,
       CodigoDaneDpmto,
@@ -505,11 +520,11 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Anexo,
       Estado_idEstado,
       Estrato_idEstrato,
-      Sexo_idSexo, // Nuevo campo para sexo
+      Sexo_idSexo,
       Contrato, // Nuevo campo para contrato
-      TelefonoTres, // Nuevo campo para teléfono adicional
-      Servicio, // Nuevo campo para servicio
-      ViaPrincipalClave, // Nuevos campos de dirección
+      TelefonoTres,
+      Servicio,
+      ViaPrincipalClave,
       ViaPrincipalValor,
       ViaSecundariaClave,
       ViaSecundariaValor,
@@ -539,6 +554,24 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         return res.status(400).json({ message: 'El número de documento ya está registrado' });
       }
   
+      // Verificar si el Contrato a actualizar ya está registrado (ignorando mayúsculas/minúsculas)
+      if (Contrato) {
+        const existingContrato = await Beneficiario.findOne({
+          where: {
+            Contrato: {
+              [Op.iLike]: Contrato,  // iLike realiza la comparación ignorando mayúsculas y minúsculas (PostgreSQL)
+            },
+            idBeneficiario: { [Op.ne]: id },  // Excluye el beneficiario actual
+          },
+        });
+  
+        if (existingContrato) {
+          return res.status(400).json({
+            message: 'El Contrato ya está registrado con otro beneficiario.',
+          });
+        }
+      }
+  
       // Registrar los valores anteriores para el historial
       const previousValues = {
         Nombre: beneficiary.Nombre,
@@ -548,7 +581,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         Telefono: beneficiary.Telefono,
         Celular: beneficiary.Celular,
         Correo: beneficiary.Correo,
-        FechaNacimiento: beneficiary.FechaNacimiento,  // Incluir FechaNacimiento en el historial
+        FechaNacimiento: beneficiary.FechaNacimiento,
         FechaInicio: beneficiary.FechaInicio,
         FechaFin: beneficiary.FechaFin,
         CodigoDaneDpmto: beneficiary.CodigoDaneDpmto,
@@ -561,9 +594,9 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         Estado_idEstado: beneficiary.Estado_idEstado,
         Estrato_idEstrato: beneficiary.Estrato_idEstrato,
         Sexo_idSexo: beneficiary.Sexo_idSexo,
-        Contrato: beneficiary.Contrato, // Incluir el historial del contrato
-        TelefonoTres: beneficiary.TelefonoTres, // Incluir el historial de teléfono adicional
-        Servicio: beneficiary.Servicio, // Incluir historial de servicio
+        Contrato: beneficiary.Contrato,
+        TelefonoTres: beneficiary.TelefonoTres,
+        Servicio: beneficiary.Servicio,
         ViaPrincipalClave: beneficiary.ViaPrincipalClave,
         ViaPrincipalValor: beneficiary.ViaPrincipalValor,
         ViaSecundariaClave: beneficiary.ViaSecundariaClave,
@@ -575,7 +608,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
       };
   
-      // Actualizar el beneficiario
+      // Actualizar el beneficiario con los nuevos valores
       beneficiary.Nombre = Nombre || beneficiary.Nombre;
       beneficiary.Apellido = Apellido || beneficiary.Apellido;
       beneficiary.TipoDocumento_idTipoDocumento = TipoDocumento_idTipoDocumento || beneficiary.TipoDocumento_idTipoDocumento;
@@ -583,7 +616,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       beneficiary.Telefono = Telefono || beneficiary.Telefono;
       beneficiary.Celular = Celular || beneficiary.Celular;
       beneficiary.Correo = Correo || beneficiary.Correo;
-      beneficiary.FechaNacimiento = FechaNacimiento || beneficiary.FechaNacimiento;  // Actualizar FechaNacimiento aquí
+      beneficiary.FechaNacimiento = FechaNacimiento || beneficiary.FechaNacimiento;
       beneficiary.FechaInicio = FechaInicio || beneficiary.FechaInicio;
       beneficiary.FechaFin = FechaFin || beneficiary.FechaFin;
       beneficiary.CodigoDaneDpmto = CodigoDaneDpmto || beneficiary.CodigoDaneDpmto;
@@ -595,7 +628,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       beneficiary.Anexo = Anexo || beneficiary.Anexo;
       beneficiary.Estado_idEstado = Estado_idEstado || beneficiary.Estado_idEstado;
       beneficiary.Estrato_idEstrato = Estrato_idEstrato || beneficiary.Estrato_idEstrato;
-      beneficiary.Sexo_idSexo = Sexo_idSexo || beneficiary.Sexo_idSexo;  // Actualizar el sexo aquí
+      beneficiary.Sexo_idSexo = Sexo_idSexo || beneficiary.Sexo_idSexo;
   
       // Nuevos campos
       beneficiary.Contrato = Contrato || beneficiary.Contrato;

@@ -40,6 +40,7 @@ const registerDocumentController = {
         archivos.map(async (file) => {
           const NombreDocumento = file.filename;
           const TipoDocumento = req.body[`${file.fieldname}_TipoDocumento`]; // Obtener TipoDocumento desde req.body
+         
   
           // Validar que TipoDocumento no esté vacío
           if (!TipoDocumento) {
@@ -70,6 +71,7 @@ const registerDocumentController = {
             if (!alreadyResponded) {
               alreadyResponded = true;
               return res.status(400).json({ message: `El archivo ${file.originalname} tiene un tipo no permitido.` });
+
             }
             return;
           }
@@ -90,7 +92,11 @@ const registerDocumentController = {
             // Si el documento ya existe, no insertamos otro registro, pero podemos continuar con la carga del archivo
             if (!alreadyResponded) {
               alreadyResponded = true;
-              return res.status(200).json({ message: 'El documento ya existe, pero el archivo ha sido subido correctamente.' });
+              return res.status(200).json({ message: 'El documento ya existe, pero el archivo ha sido subido correctamente.',
+                TipoDocumento: TipoDocumento // Devuelves el valor de TipoDocumento
+               });
+              
+              
             }
             return;
           }
