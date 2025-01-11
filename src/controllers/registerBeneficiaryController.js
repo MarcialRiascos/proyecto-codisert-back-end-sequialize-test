@@ -61,29 +61,27 @@ const registerBeneficiaryController = {
   
     try {
       // Verificar si el NumeroDocumento ya está registrado
-      const existingBeneficiaryByDocumento = await Beneficiario.findOne({
-        where: { NumeroDocumento },  // Buscamos un beneficiario con el mismo número de documento
+      const existingBeneficiary = await Beneficiario.findOne({
+        where: { NumeroDocumento },
       });
   
-      if (existingBeneficiaryByDocumento) {
+      if (existingBeneficiary) {
         return res.status(400).json({
           message: 'El Número de Documento ya está registrado con otro beneficiario.',
         });
       }
   
-      // Verificar si el Contrato ya está registrado (ignorando mayúsculas/minúsculas)
-      const existingBeneficiaryByContrato = await Beneficiario.findOne({
-        where: {
-          Contrato: {
-            [Op.iLike]: Contrato,  // iLike realiza la comparación ignorando mayúsculas y minúsculas (PostgreSQL)
-          },
-        },
-      });
-  
-      if (existingBeneficiaryByContrato) {
-        return res.status(400).json({
-          message: 'El Contrato ya está registrado con otro beneficiario.',
+      // Verificar si el Contrato ya está registrado
+      if (Contrato) {
+        const existingBeneficiaryByContrato = await Beneficiario.findOne({
+          where: { Contrato },
         });
+  
+        if (existingBeneficiaryByContrato) {
+          return res.status(400).json({
+            message: 'El Contrato ya está registrado con otro beneficiario.',
+          });
+        }
       }
   
       // Insertar el beneficiario en la base de datos
@@ -134,7 +132,7 @@ const registerBeneficiaryController = {
   
       res.status(201).json({
         message: 'Beneficiario registrado exitosamente',
-        newBeneficiaryId: newBeneficiary.idBeneficiario,  // ID del beneficiario recién registrado
+        newBeneficiaryId: newBeneficiary.idBeneficiario,
       });
     } catch (err) {
       console.error('Error al registrar el beneficiario:', err);
@@ -521,7 +519,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Estado_idEstado,
       Estrato_idEstrato,
       Sexo_idSexo,
-      Contrato, // Nuevo campo para contrato
+      Contrato,
       TelefonoTres,
       Servicio,
       ViaPrincipalClave,
@@ -535,7 +533,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       TipoUnidadDosValor,
     } = req.body;
   
-    const idAdministrador = req.user.id; // ID del administrador activo (extraído del middleware de autenticación)
+    const idAdministrador = req.user.id;
   
     try {
       // Buscar el beneficiario
@@ -545,70 +543,32 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         return res.status(404).json({ message: 'Beneficiario no encontrado' });
       }
   
-      // Verificar si el número de documento ya está registrado
-      const existingBeneficiary = await Beneficiario.findOne({
-        where: { NumeroDocumento: NumeroDocumento, idBeneficiario: { [Op.ne]: id } }, // Excluye el beneficiario actual
+      // Verificar si el número de documento ya está registrado en otro beneficiario
+      const existingBeneficiaryByDocumento = await Beneficiario.findOne({
+        where: { NumeroDocumento, idBeneficiario: { [Op.ne]: id } },
       });
   
-      if (existingBeneficiary) {
+      if (existingBeneficiaryByDocumento) {
         return res.status(400).json({ message: 'El número de documento ya está registrado' });
       }
   
-      // Verificar si el Contrato a actualizar ya está registrado (ignorando mayúsculas/minúsculas)
+      // Verificar si el contrato ya está registrado en otro beneficiario
       if (Contrato) {
-        const existingContrato = await Beneficiario.findOne({
-          where: {
-            Contrato: {
-              [Op.iLike]: Contrato,  // iLike realiza la comparación ignorando mayúsculas y minúsculas (PostgreSQL)
-            },
-            idBeneficiario: { [Op.ne]: id },  // Excluye el beneficiario actual
-          },
+        const existingBeneficiaryByContrato = await Beneficiario.findOne({
+          where: { Contrato, idBeneficiario: { [Op.ne]: id } },
         });
   
-        if (existingContrato) {
+        if (existingBeneficiaryByContrato) {
           return res.status(400).json({
-            message: 'El Contrato ya está registrado con otro beneficiario.',
+            message: 'El contrato ya está registrado con otro beneficiario',
           });
         }
       }
   
       // Registrar los valores anteriores para el historial
-      const previousValues = {
-        Nombre: beneficiary.Nombre,
-        Apellido: beneficiary.Apellido,
-        TipoDocumento_idTipoDocumento: beneficiary.TipoDocumento_idTipoDocumento,
-        NumeroDocumento: beneficiary.NumeroDocumento,
-        Telefono: beneficiary.Telefono,
-        Celular: beneficiary.Celular,
-        Correo: beneficiary.Correo,
-        FechaNacimiento: beneficiary.FechaNacimiento,
-        FechaInicio: beneficiary.FechaInicio,
-        FechaFin: beneficiary.FechaFin,
-        CodigoDaneDpmto: beneficiary.CodigoDaneDpmto,
-        CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
-        Departamento: beneficiary.Departamento,
-        Municipio: beneficiary.Municipio,
-        Direccion: beneficiary.Direccion,
-        Barrio: beneficiary.Barrio,
-        Anexo: beneficiary.Anexo,
-        Estado_idEstado: beneficiary.Estado_idEstado,
-        Estrato_idEstrato: beneficiary.Estrato_idEstrato,
-        Sexo_idSexo: beneficiary.Sexo_idSexo,
-        Contrato: beneficiary.Contrato,
-        TelefonoTres: beneficiary.TelefonoTres,
-        Servicio: beneficiary.Servicio,
-        ViaPrincipalClave: beneficiary.ViaPrincipalClave,
-        ViaPrincipalValor: beneficiary.ViaPrincipalValor,
-        ViaSecundariaClave: beneficiary.ViaSecundariaClave,
-        ViaSecundariaValor: beneficiary.ViaSecundariaValor,
-        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos,
-        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave,
-        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor,
-        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave,
-        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
-      };
+      const previousValues = { ...beneficiary.toJSON() };
   
-      // Actualizar el beneficiario con los nuevos valores
+      // Actualizar el beneficiario
       beneficiary.Nombre = Nombre || beneficiary.Nombre;
       beneficiary.Apellido = Apellido || beneficiary.Apellido;
       beneficiary.TipoDocumento_idTipoDocumento = TipoDocumento_idTipoDocumento || beneficiary.TipoDocumento_idTipoDocumento;
