@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Ruta para cargar documentos (usamos el middleware de multer)
 router.post('/upload/:idBeneficiario', authAdminRegisMiddleware, upload.fields([
-    { name: 'contratos', maxCount: 1 },
+    { name: 'contrato', maxCount: 1 },
     { name: 'dni', maxCount: 1 },
     { name: 'declaracion', maxCount: 1 },
     { name: 'fachada', maxCount: 1 },

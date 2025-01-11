@@ -23,7 +23,7 @@ const registerDocumentController = {
   
       // Definir las rutas de los tipos de documentos
       const tipoDocumentosRuta = {
-        contratos: 'contratos',
+        contrato: 'contratos',
         dni: 'dnis',
         declaracion: 'declaraciones',
         fachada: 'fachadas',

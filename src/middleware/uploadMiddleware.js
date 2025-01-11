@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
     // Crear subcarpetas según el 'fieldname' (nombre del archivo)
     switch (fieldName) {
-      case 'contratos':
+      case 'contrato':
         uploadPath = path.join(uploadPath, 'contratos');
         break;
       case 'dni':
