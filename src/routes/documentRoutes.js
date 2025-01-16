@@ -15,7 +15,8 @@ router.post('/upload/:idBeneficiario', authAdminRegisMiddleware, upload.fields([
     { name: 'fachada', maxCount: 1 },
     { name: 'test', maxCount: 1 },
     { name: 'serial', maxCount: 1 },
-    { name: 'recibo', maxCount: 1 }
+    { name: 'recibo', maxCount: 1 },
+    { name: 'facturacion', maxCount: 1 },
   ]), uploadDocument);
 router.get('/search-alls', authAdminRegisLectMiddleware, UsarController.getAllDocuments);
 router.get('/search/:idDocumentos', authAdminRegisLectMiddleware, UsarController.getDocumentById);

@@ -9,18 +9,18 @@ const registerDocumentController = {
   async uploadDocument(req, res) {
     try {
       const { idBeneficiario } = req.params;
-  
+
       // Verificar que se haya cargado un archivo
       if (!req?.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ message: 'No se ha cargado ningún archivo' });
       }
-  
+
       // Obtener el ID del administrador desde el usuario autenticado
       const Administrador_idAdministrador = req.user.id;
-  
+
       // Obtener todos los archivos cargados
       const archivos = Object.getOwnPropertyNames(req.files).map(name => req.files[name][0]);
-  
+
       // Definir las rutas de los tipos de documentos
       const tipoDocumentosRuta = {
         contrato: 'contratos',
@@ -30,18 +30,19 @@ const registerDocumentController = {
         test: 'tests',
         serial: 'seriales',
         recibo: 'recibos',
+        facturacion: 'facturaciones'
       };
-  
+
       // Variable para controlar si se debe responder ya
       let alreadyResponded = false;
-  
+
       // Validar y procesar los archivos cargados
       await Promise.all(
         archivos.map(async (file) => {
           const NombreDocumento = file.filename;
           const TipoDocumento = req.body[`${file.fieldname}_TipoDocumento`]; // Obtener TipoDocumento desde req.body
-         
-  
+
+
           // Validar que TipoDocumento no esté vacío
           if (!TipoDocumento) {
             if (!alreadyResponded) {
@@ -50,10 +51,10 @@ const registerDocumentController = {
             }
             return; // Si ya se envió respuesta, no continuar procesando.
           }
-  
+
           // Obtener la carpeta correspondiente al TipoDocumento
           const carpetaDocumento = tipoDocumentosRuta[TipoDocumento];
-  
+
           if (!carpetaDocumento) {
             if (!alreadyResponded) {
               alreadyResponded = true;
@@ -61,12 +62,13 @@ const registerDocumentController = {
             }
             return; // Si ya se envió respuesta, no continuar procesando.
           }
-  
+
           // Formar la URL completa
           const urlDocumento = `uploads/${carpetaDocumento}/${file.filename}`;
-  
+
           // Aquí puedes agregar validaciones de tipo de archivo y tamaño si es necesario
-          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'application/msword']; // Agregar los tipos permitidos
+          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'application/msword', 'application/vnd.ms-excel', // Excel antiguo (.xls)
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']; // Agregar los tipos permitidos
           if (!allowedTypes.includes(file.mimetype)) {
             if (!alreadyResponded) {
               alreadyResponded = true;
@@ -75,7 +77,7 @@ const registerDocumentController = {
             }
             return;
           }
-  
+
           const maxSize = 5 * 1024 * 1024; // 5MB
           if (file.size > maxSize) {
             if (!alreadyResponded) {
@@ -84,23 +86,24 @@ const registerDocumentController = {
             }
             return;
           }
-  
+
           // Verificar si el documento ya existe en la base de datos (con la misma URL)
           const documentoExistente = await Documento.findOne({ where: { Url: urlDocumento, Beneficiario_idBeneficiario: idBeneficiario } });
-  
+
           if (documentoExistente) {
             // Si el documento ya existe, no insertamos otro registro, pero podemos continuar con la carga del archivo
             if (!alreadyResponded) {
               alreadyResponded = true;
-              return res.status(200).json({ message: 'El documento ya existe, pero el archivo ha sido subido correctamente.',
+              return res.status(200).json({
+                message: 'El documento ya existe, pero el archivo ha sido subido correctamente.',
                 TipoDocumento: TipoDocumento // Devuelves el valor de TipoDocumento
-               });
-              
-              
+              });
+
+
             }
             return;
           }
-  
+
           // Si no existe, insertar el nuevo documento
           const documento = await Documento.create({
             NombreDocumento,
@@ -109,7 +112,7 @@ const registerDocumentController = {
             Beneficiario_idBeneficiario: idBeneficiario,
             Administrador_idAdministrador,
           });
-  
+
           // Registrar el cambio en HistorialCambio
           await HistorialCambio.create({
             Accion: 'Creación',
@@ -120,7 +123,7 @@ const registerDocumentController = {
           });
         })
       );
-  
+
       // Si todo fue bien y no se ha respondido aún, se envía la respuesta final
       if (!alreadyResponded) {
         res.status(200).json({ message: 'Archivos cargados y documentos registrados correctamente.' });
@@ -295,21 +298,21 @@ const registerDocumentController = {
   async deleteDocument(req, res) {
     try {
       const { idDocumentos } = req.params;
-  
+
       // Buscar el documento para obtener la URL del archivo
       const documento = await Documento.findOne({ where: { idDocumentos } });
-  
+
       if (!documento) {
         return res.status(404).json({ message: 'Documento no encontrado' });
       }
-  
+
       // Extraer la ruta relativa del archivo desde Url
-    
+
       /* const relativePath = documento.Url.replace(/^http:\/\/localhost:\d+\//, ''); // Elimina "http://localhost:3000/" o similar
       const filePath = path.resolve(__dirname, '../..', relativePath); // Construye la ruta absoluta */
 
       const filePath = path.resolve(__dirname, '..', '..', documento.Url.replace(/^https?:\/\/[^/]+\//, ''));
-  
+
       // Intentar eliminar el archivo del sistema de archivos
       try {
         await fs.access(filePath); // Verifica si el archivo existe
@@ -318,7 +321,7 @@ const registerDocumentController = {
         console.error(`Error al intentar eliminar el archivo: ${filePath}`, err.message);
         // Continuar con la eliminación en la base de datos aunque el archivo no exista
       }
-  
+
       // Registrar el cambio en HistorialCambio antes de eliminar
       await HistorialCambio.create({
         Accion: 'Eliminación',
@@ -327,12 +330,12 @@ const registerDocumentController = {
         Administrador_idAdministrador: req.user.id,
         Beneficiario_idBeneficiario: documento.Beneficiario_idBeneficiario,
       });
-  
+
       // Eliminar el documento de la base de datos
       await Documento.destroy({
         where: { idDocumentos },
       });
-  
+
       res.status(200).json({ message: 'Documento eliminado exitosamente' });
     } catch (err) {
       console.error('Error al eliminar el documento:', err.message);

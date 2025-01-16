@@ -35,6 +35,9 @@ const storage = multer.diskStorage({
       case 'recibo':
         uploadPath = path.join(uploadPath, 'recibos');
         break;
+        case 'facturacion':
+        uploadPath = path.join(uploadPath, 'facturaciones');
+        break;
       default:
         uploadPath = path.join(uploadPath, 'otros'); // Para documentos no clasificados
         break;
@@ -76,7 +79,8 @@ const storage = multer.diskStorage({
 });
 
 // Filtro de archivos (solo imágenes o PDFs permitidos)
-const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/vnd.ms-excel', // Excel antiguo (.xls)
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);

@@ -40,12 +40,13 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
 };
 
+
 app.use(morgan('dev'));
 // Middleware
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(cookieParser());
-
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -56,6 +57,7 @@ app.use('/uploads/fachadas', express.static(path.join(__dirname, '../uploads/fac
 app.use('/uploads/tests', express.static(path.join(__dirname, '../uploads/tests')));
 app.use('/uploads/seriales', express.static(path.join(__dirname, '../uploads/seriales')));
 app.use('/uploads/recibos', express.static(path.join(__dirname, '../uploads/recibos')));
+app.use('/uploads/facturaciones', express.static(path.join(__dirname, '../uploads/facturaciones')));
 
 // Rutas
 app.use('/auth', authRoutes);
