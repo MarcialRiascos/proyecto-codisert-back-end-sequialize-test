@@ -24,6 +24,11 @@ module.exports = {
         Estado: 'Suspendido',
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      {
+        Estado: 'Desconectado',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ], {});
   },

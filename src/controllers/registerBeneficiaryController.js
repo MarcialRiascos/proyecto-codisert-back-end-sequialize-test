@@ -568,41 +568,48 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       // Registrar los valores anteriores para el historial
       const previousValues = { ...beneficiary.toJSON() };
   
-      // Actualizar el beneficiario
-      beneficiary.Nombre = Nombre || beneficiary.Nombre;
-      beneficiary.Apellido = Apellido || beneficiary.Apellido;
-      beneficiary.TipoDocumento_idTipoDocumento = TipoDocumento_idTipoDocumento || beneficiary.TipoDocumento_idTipoDocumento;
-      beneficiary.NumeroDocumento = NumeroDocumento || beneficiary.NumeroDocumento;
-      beneficiary.Telefono = Telefono || beneficiary.Telefono;
-      beneficiary.Celular = Celular || beneficiary.Celular;
-      beneficiary.Correo = Correo || beneficiary.Correo;
-      beneficiary.FechaNacimiento = FechaNacimiento || beneficiary.FechaNacimiento;
-      beneficiary.FechaInicio = FechaInicio || beneficiary.FechaInicio;
-      beneficiary.FechaFin = FechaFin || beneficiary.FechaFin;
-      beneficiary.CodigoDaneDpmto = CodigoDaneDpmto || beneficiary.CodigoDaneDpmto;
-      beneficiary.CodigoDaneMunicipio = CodigoDaneMunicipio || beneficiary.CodigoDaneMunicipio;
-      beneficiary.Departamento = Departamento || beneficiary.Departamento;
-      beneficiary.Municipio = Municipio || beneficiary.Municipio;
-      beneficiary.Direccion = Direccion || beneficiary.Direccion;
-      beneficiary.Barrio = Barrio || beneficiary.Barrio;
-      beneficiary.Anexo = Anexo || beneficiary.Anexo;
-      beneficiary.Estado_idEstado = Estado_idEstado || beneficiary.Estado_idEstado;
-      beneficiary.Estrato_idEstrato = Estrato_idEstrato || beneficiary.Estrato_idEstrato;
-      beneficiary.Sexo_idSexo = Sexo_idSexo || beneficiary.Sexo_idSexo;
+      // Actualizar solo los campos presentes en req.body
+      const fieldsToUpdate = {
+        Nombre,
+        Apellido,
+        TipoDocumento_idTipoDocumento,
+        NumeroDocumento,
+        Telefono,
+        Celular,
+        Correo,
+        FechaNacimiento,
+        FechaInicio,
+        FechaFin,
+        CodigoDaneDpmto,
+        CodigoDaneMunicipio,
+        Departamento,
+        Municipio,
+        Direccion,
+        Barrio,
+        Anexo,
+        Estado_idEstado,
+        Estrato_idEstrato,
+        Sexo_idSexo,
+        Contrato,
+        TelefonoTres,
+        Servicio,
+        ViaPrincipalClave,
+        ViaPrincipalValor,
+        ViaSecundariaClave,
+        ViaSecundariaValor,
+        ViaSecundariaValorDos,
+        TipoUnidadUnoClave,
+        TipoUnidadUnoValor,
+        TipoUnidadDosClave,
+        TipoUnidadDosValor,
+      };
   
-      // Nuevos campos
-      beneficiary.Contrato = Contrato || beneficiary.Contrato;
-      beneficiary.TelefonoTres = TelefonoTres || beneficiary.TelefonoTres;
-      beneficiary.Servicio = Servicio || beneficiary.Servicio;
-      beneficiary.ViaPrincipalClave = ViaPrincipalClave || beneficiary.ViaPrincipalClave;
-      beneficiary.ViaPrincipalValor = ViaPrincipalValor || beneficiary.ViaPrincipalValor;
-      beneficiary.ViaSecundariaClave = ViaSecundariaClave || beneficiary.ViaSecundariaClave;
-      beneficiary.ViaSecundariaValor = ViaSecundariaValor || beneficiary.ViaSecundariaValor;
-      beneficiary.ViaSecundariaValorDos = ViaSecundariaValorDos || beneficiary.ViaSecundariaValorDos;
-      beneficiary.TipoUnidadUnoClave = TipoUnidadUnoClave || beneficiary.TipoUnidadUnoClave;
-      beneficiary.TipoUnidadUnoValor = TipoUnidadUnoValor || beneficiary.TipoUnidadUnoValor;
-      beneficiary.TipoUnidadDosClave = TipoUnidadDosClave || beneficiary.TipoUnidadDosClave;
-      beneficiary.TipoUnidadDosValor = TipoUnidadDosValor || beneficiary.TipoUnidadDosValor;
+      // Solo actualizar los campos presentes en req.body
+      Object.entries(fieldsToUpdate).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          beneficiary[key] = value;
+        }
+      });
   
       // Guardar cambios
       await beneficiary.save();

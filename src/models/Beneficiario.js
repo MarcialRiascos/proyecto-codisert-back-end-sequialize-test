@@ -58,7 +58,7 @@ const Beneficiario = sequelize.define('Beneficiario', {
   },
   FechaInicio: {
     type: DataTypes.DATEONLY, // Para guardar solo la fecha
-    allowNull: false,
+    allowNull: true,
   },
   FechaFin: {
     type: DataTypes.DATEONLY, // Para guardar solo la fecha
@@ -86,7 +86,7 @@ const Beneficiario = sequelize.define('Beneficiario', {
   },
   Direccion: {
     type: DataTypes.STRING(45),
-    allowNull: false,
+    allowNull: true,
   },
   ViaPrincipalClave: {
     type: DataTypes.STRING(45),

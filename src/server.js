@@ -19,6 +19,7 @@ const facturacionRoutes = require('./routes/facturacionRoutes');
 const morgan = require('morgan');
 const path = require('path');
 
+
 // Importa la conexión de Sequelize
 const sequelize = require('./config/db');
 const { Beneficiario } = require('./models/Beneficiario');
@@ -47,6 +48,7 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(cookieParser());
+
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 

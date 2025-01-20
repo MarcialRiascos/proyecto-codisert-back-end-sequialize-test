@@ -77,51 +77,55 @@ const registerAdminController = {
       Password,
       Estado_idEstado,
       Rol_idRol,
-      Sexo_idSexo, // Incluir sexo en la solicitud
+      Sexo_idSexo,
+      Administrador_idAdministrador,
     } = req.body;
-
+  
     try {
       // Verificar si el administrador existe
       const existingAdmin = await Administrador.findByPk(id);
-
+  
       if (!existingAdmin) {
         return res.status(404).json({ message: 'Administrador no encontrado' });
       }
-
+  
       // Verificar si el NumeroDocumento ya está registrado con otro administrador
-      const duplicateAdmin = await Administrador.findOne({
-        where: {
-          NumeroDocumento,
-          idAdministrador: { [Op.ne]: id }, // Excluir al administrador actual
-        },
-      });
-
-      if (duplicateAdmin) {
-        return res.status(400).json({
-          message: 'El Número de Documento ya está registrado con otro administrador.',
+      if (NumeroDocumento) { // Solo realizar esta verificación si NumeroDocumento está presente
+        const duplicateAdmin = await Administrador.findOne({
+          where: {
+            NumeroDocumento,
+            idAdministrador: { [Op.ne]: id }, // Excluir al administrador actual
+          },
         });
+  
+        if (duplicateAdmin) {
+          return res.status(400).json({
+            message: 'El Número de Documento ya está registrado con otro administrador.',
+          });
+        }
       }
-
+  
       // Encriptar la contraseña si se proporciona
       let hashedPassword = null;
       if (Password) {
         hashedPassword = await bcrypt.hash(Password, 10);
       }
-
+  
       // Actualizar los datos del administrador
       await existingAdmin.update({
-        Nombre: Nombre || existingAdmin.Nombre,
-        Apellido: Apellido || existingAdmin.Apellido,
-        TipoDocumento_idTipoDocumento: TipoDocumento_idTipoDocumento || existingAdmin.TipoDocumento_idTipoDocumento,
-        NumeroDocumento: NumeroDocumento || existingAdmin.NumeroDocumento,
-        Telefono: Telefono || existingAdmin.Telefono,
-        Correo: Correo || existingAdmin.Correo,
-        Password: hashedPassword || existingAdmin.Password,
-        Estado_idEstado: Estado_idEstado || existingAdmin.Estado_idEstado,
-        Rol_idRol: Rol_idRol || existingAdmin.Rol_idRol,
-        Sexo_idSexo: Sexo_idSexo || existingAdmin.Sexo_idSexo, // Actualizar el sexo si se proporciona
+        Nombre: Nombre || existingAdmin.Nombre, // Si no se proporciona, mantener el actual
+        Apellido: Apellido || existingAdmin.Apellido, // Si no se proporciona, mantener el actual
+        TipoDocumento_idTipoDocumento: TipoDocumento_idTipoDocumento || existingAdmin.TipoDocumento_idTipoDocumento, // Si no se proporciona, mantener el actual
+        NumeroDocumento: NumeroDocumento || existingAdmin.NumeroDocumento, // Si no se proporciona, mantener el actual
+        Telefono: Telefono !== undefined ? Telefono : existingAdmin.Telefono, // Si no se proporciona, mantener el actual
+        Correo: Correo || existingAdmin.Correo, // Si no se proporciona, mantener el actual
+        Password: hashedPassword !== null ? hashedPassword : existingAdmin.Password, // Si no se proporciona, mantener el actual
+        Estado_idEstado: Estado_idEstado || existingAdmin.Estado_idEstado, // Si no se proporciona, mantener el actual
+        Rol_idRol: Rol_idRol || existingAdmin.Rol_idRol, // Si no se proporciona, mantener el actual
+        Sexo_idSexo: Sexo_idSexo || existingAdmin.Sexo_idSexo, // Si no se proporciona, mantener el actual
+        Administrador_idAdministrador: Administrador_idAdministrador !== undefined ? Administrador_idAdministrador : existingAdmin.Administrador_idAdministrador, // Si no se proporciona, mantener el actual
       });
-
+  
       res.status(200).json({ message: 'Administrador actualizado exitosamente' });
     } catch (err) {
       console.error('Error al actualizar el administrador:', err);

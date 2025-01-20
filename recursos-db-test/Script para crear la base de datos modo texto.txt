@@ -125,7 +125,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `proyecto_codisert`.`Beneficiario` ;
 
 CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Beneficiario` (
-  `idBeneficiario` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   `idBeneficiario` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Contrato` VARCHAR(45) NULL,
   `Nombre` VARCHAR(45) NOT NULL,
   `Apellido` VARCHAR(45) NOT NULL,
@@ -135,15 +135,15 @@ CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Beneficiario` (
   `Celular` VARCHAR(45) NULL,
   `TelefonoTres` VARCHAR(45) NULL,
   `Correo` VARCHAR(45) NULL,
-  `FechaNacimiento` DATE NOT NULL,
-  `FechaInicio` DATE NOT NULL,
+  `FechaNacimiento` DATE NULL,
+  `FechaInicio` DATE NULL,
   `FechaFin` DATE NULL,
   `CodigoDaneDpmto` VARCHAR(45) NOT NULL,
   `Departamento` VARCHAR(45) NOT NULL,
   `CodigoDaneMunicipio` VARCHAR(45) NOT NULL,
   `Municipio` VARCHAR(45) NOT NULL,
   `Servicio` VARCHAR(45) NULL,
-  `Direccion` VARCHAR(45) NOT NULL,
+  `Direccion` VARCHAR(45) NULL,
   `ViaPrincipalClave` VARCHAR(45) NULL,
   `ViaPrincipalValor` VARCHAR(45) NULL,
   `ViaSecundariaClave` VARCHAR(45) NULL,

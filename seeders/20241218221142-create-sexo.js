@@ -6,8 +6,7 @@ module.exports = {
     // Datos a insertar
     const sexos = [
       { Sexo: 'Masculino', createdAt: new Date(), updatedAt: new Date() },
-      { Sexo: 'Femenino', createdAt: new Date(), updatedAt: new Date() },
-      { Sexo: 'Otro', createdAt: new Date(), updatedAt: new Date() }
+      { Sexo: 'Femenino', createdAt: new Date(), updatedAt: new Date() }
     ];
 
     // Insertar los datos en la tabla Sexo
