@@ -30,7 +30,7 @@ const registerDocumentController = {
         test: 'tests',
         serial: 'seriales',
         recibo: 'recibos',
-        facturacion: 'facturaciones'
+        anexo: 'anexos'
       };
 
       // Variable para controlar si se debe responder ya
