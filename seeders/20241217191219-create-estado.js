@@ -29,6 +29,11 @@ module.exports = {
         Estado: 'Desconectado',
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      {
+        Estado: 'Registrado',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ], {});
   },

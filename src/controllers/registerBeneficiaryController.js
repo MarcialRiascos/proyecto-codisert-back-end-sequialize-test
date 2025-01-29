@@ -31,6 +31,7 @@ const registerBeneficiaryController = {
       Departamento,
       Municipio,
       Servicio,
+      Tecnologia,
       Direccion,
       ViaPrincipalClave,
       ViaPrincipalValor,
@@ -103,6 +104,7 @@ const registerBeneficiaryController = {
         Departamento: Departamento || null,
         Municipio: Municipio || null,
         Servicio: Servicio || null,
+        Tecnologia: Tecnologia || null,
         Direccion,
         ViaPrincipalClave: ViaPrincipalClave || null,
         ViaPrincipalValor: ViaPrincipalValor || null,
@@ -207,6 +209,7 @@ const registerBeneficiaryController = {
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
         Servicio: beneficiary.Servicio, // Nuevo campo
+        Tecnologia: beneficiary.Tecnologia, // Nuevo campo
         Direccion: beneficiary.Direccion,
         ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
         ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
@@ -260,11 +263,18 @@ const registerBeneficiaryController = {
   },
   
   // Obtener un beneficiario por su ID
-  async getBeneficiaryById(req, res) {
+  async getBeneficiaryById(req, res) {   
     const { id } = req.params;
-  
+
     try {
-      const beneficiary = await Beneficiario.findByPk(id, {
+      const beneficiary = await Beneficiario.findOne({
+        where: {
+          [Op.or]: [
+            {idBeneficiario: id},
+            {NumeroDocumento: id},
+            {Contrato: id}
+          ]
+        },
         include: [
           {
             model: Estado,
@@ -298,11 +308,13 @@ const registerBeneficiaryController = {
           },
         ],
       });
-  
+
+      console.log(beneficiary);
+
       if (!beneficiary) {
         return res.status(404).json({ message: 'Beneficiario no encontrado' });
       }
-  
+
       const formattedBeneficiary = {
         idBeneficiario: beneficiary.idBeneficiario,
         Contrato: beneficiary.Contrato, // Nuevo campo
@@ -325,6 +337,7 @@ const registerBeneficiaryController = {
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
         Servicio: beneficiary.Servicio, // Nuevo campo
+        Tecnologia: beneficiary.Tecnologia, // Nuevo campo
         Direccion: beneficiary.Direccion,
         ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
         ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
@@ -363,7 +376,7 @@ const registerBeneficiaryController = {
           Url: doc.Url,
         })),
       };
-  
+
       res.status(200).json({
         message: 'Beneficiario encontrado',
         data: formattedBeneficiary,
@@ -444,6 +457,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Departamento: beneficiary.Departamento,
       Municipio: beneficiary.Municipio,
       Servicio: beneficiary.Servicio, // Nuevo campo
+      Tecnologia: beneficiary.Tecnologia, // Nuevo campo
       Direccion: beneficiary.Direccion,
       ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
       ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
@@ -522,6 +536,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       Contrato,
       TelefonoTres,
       Servicio,
+      Tecnologia,
       ViaPrincipalClave,
       ViaPrincipalValor,
       ViaSecundariaClave,
@@ -593,6 +608,7 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         Contrato,
         TelefonoTres,
         Servicio,
+        Tecnologia,
         ViaPrincipalClave,
         ViaPrincipalValor,
         ViaSecundariaClave,

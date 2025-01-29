@@ -67,7 +67,7 @@ const registerDocumentController = {
           const urlDocumento = `uploads/${carpetaDocumento}/${file.filename}`;
 
           // Aquí puedes agregar validaciones de tipo de archivo y tamaño si es necesario
-          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'application/msword', 'application/vnd.ms-excel', // Excel antiguo (.xls)
+          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'application/msword', 'application/vnd.ms-excel', // Excel antiguo (.xls)
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']; // Agregar los tipos permitidos
           if (!allowedTypes.includes(file.mimetype)) {
             if (!alreadyResponded) {

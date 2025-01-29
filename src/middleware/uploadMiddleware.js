@@ -79,7 +79,7 @@ const storage = multer.diskStorage({
 });
 
 // Filtro de archivos (solo imágenes o PDFs permitidos)
-const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/vnd.ms-excel', // Excel antiguo (.xls)
+const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf', 'application/vnd.ms-excel', // Excel antiguo (.xls)
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {

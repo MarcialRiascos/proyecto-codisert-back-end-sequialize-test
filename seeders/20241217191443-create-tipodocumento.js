@@ -6,17 +6,22 @@ module.exports = {
     // Insertar los tipos de documento en la tabla 'tipodocumento'
     await queryInterface.bulkInsert('tipodocumento', [
       {
-        TipoDocumento: 'Cedula de ciudadanía',
+        TipoDocumento: 'CC',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        TipoDocumento: 'Cedula de ciudadanía extranjera',
+        TipoDocumento: 'PAS',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        TipoDocumento: 'Pasaporte',
+        TipoDocumento: 'CE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        TipoDocumento: 'NIT',
         createdAt: new Date(),
         updatedAt: new Date(),
       }

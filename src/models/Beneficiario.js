@@ -84,6 +84,10 @@ const Beneficiario = sequelize.define('Beneficiario', {
     type: DataTypes.STRING(45),
     allowNull: true,
   },
+  Tecnologia: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
   Direccion: {
     type: DataTypes.STRING(45),
     allowNull: true,

@@ -26,7 +26,8 @@ const jwt = require('jsonwebtoken');
 
 // Middleware para verificar el rol y manejar la expiración del token
 const authMiddleware = (role) => (req, res, next) => {
-  const token = req.cookies.token;
+  //const token = req.cookies.token;
+  const token = req.headers.authorization?.split(' ')[1];
 
   // Si no hay token, retornamos un error de autenticación
   if (!token) return res.status(401).json({ message: 'Token no proporcionado' });

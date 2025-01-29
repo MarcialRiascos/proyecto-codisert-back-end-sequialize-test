@@ -120,8 +120,8 @@ const authController = {
   },
 
   async refreshToken(req, res) {
-    const { refreshToken } = req.cookies; // Obtener el refresh token de la cookie
-
+    // const { refreshToken } = req.cookies; // Obtener el refresh token de la cookie
+    const refreshToken = req.headers.authorization?.split(' ')[1];
     if (!refreshToken) {
       return res.status(401).json({ message: 'No se ha proporcionado un refresh token' });
     }

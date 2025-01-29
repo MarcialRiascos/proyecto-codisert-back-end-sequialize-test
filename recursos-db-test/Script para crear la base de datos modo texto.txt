@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Beneficiario` (
   `CodigoDaneMunicipio` VARCHAR(45) NOT NULL,
   `Municipio` VARCHAR(45) NOT NULL,
   `Servicio` VARCHAR(45) NULL,
+  `Tecnologia` VARCHAR(45) NULL,
   `Direccion` VARCHAR(45) NULL,
   `ViaPrincipalClave` VARCHAR(45) NULL,
   `ViaPrincipalValor` VARCHAR(45) NULL,

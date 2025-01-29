@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const sequelize = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const documentRoutes = require('./routes/documentRoutes'); 
 const registerAdminRoutes = require('./routes/registerAdminRoutes'); 
@@ -20,8 +21,10 @@ const morgan = require('morgan');
 const path = require('path');
 
 
+
+
 // Importa la conexión de Sequelize
-const sequelize = require('./config/db');
+
 const { Beneficiario } = require('./models/Beneficiario');
 const Documento = require('./models/Documento');
 
