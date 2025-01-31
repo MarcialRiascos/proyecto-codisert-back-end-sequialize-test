@@ -156,6 +156,8 @@ CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Beneficiario` (
   `TipoUnidadDosValor` VARCHAR(45) NULL,
   `Barrio` VARCHAR(45) NULL,
   `Anexo` VARCHAR(255) NULL,
+  `FPrimAct` VARCHAR(45) NULL,
+  `FUltDX` VARCHAR(45) NULL,
   `Estado_idEstado` INT UNSIGNED NOT NULL,
   `Estrato_idEstrato` INT UNSIGNED NOT NULL,
   `Administrador_idAdministrador` INT UNSIGNED NOT NULL,
@@ -287,6 +289,25 @@ CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Facturacion` (
   `NombreDocumento` VARCHAR(45) NOT NULL,
   `Url` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idFacturacion`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `proyecto_codisert`.`Factura`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `proyecto_codisert`.`Factura` ;
+
+CREATE TABLE IF NOT EXISTS `proyecto_codisert`.`Factura` (
+  `idFactura` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `FechaFra` VARCHAR(45) NULL,
+  `Factura` VARCHAR(45) NULL,
+  `Contrato` VARCHAR(45) NULL,
+  `Mes` VARCHAR(45) NULL,
+  `Clase` VARCHAR(45) NULL,
+  `Servicio` VARCHAR(45) NULL,
+  `AntesImptos` INT NULL,
+  `Imptos` INT NULL,
+  `Facturado` INT NULL,
+  PRIMARY KEY (`idFactura`))
 ENGINE = InnoDB;
 
 

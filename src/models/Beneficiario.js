@@ -136,6 +136,14 @@ const Beneficiario = sequelize.define('Beneficiario', {
     type: DataTypes.STRING(255),
     allowNull: true,
   },
+  FPrimAct: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  FUltDX: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
   Estado_idEstado: {
     type: DataTypes.INTEGER,
     allowNull: false,

@@ -9,6 +9,9 @@ const Sexo = require('../models/Sexo'); // Modelo de Sexo
 const Documento = require('../models/Documento'); // Modelo de Sexo
 const path = require('path'); // Asegúrate de importar 'path' al principio de tu archivo
 const fs = require('fs').promises; // Asegúrate de importar 'fs' correctamente
+const XLSX = require('xlsx');
+const upload = require('../middleware/actualizarEstadoMiddleware'); // Middleware de carga
+const moment = require('moment');
 
 const registerBeneficiaryController = {
   // Registrar un beneficiario
@@ -719,6 +722,88 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         message: 'Error al eliminar el beneficiario',
         error: err.message,
       });
+    }
+  },
+
+  updateBeneficiariosFromExcel: async (req, res) => {
+    try {
+      // Usamos multer para manejar el archivo subido en memoria
+      upload(req, res, async (err) => {
+        if (err) {
+          return res.status(400).json({ message: err.message }); // Si ocurre un error, respondemos con el mensaje
+        }
+
+        if (!req.file) {
+          return res.status(400).json({ message: 'No se ha subido ningún archivo Excel' });
+        }
+
+        // Leemos el archivo Excel directamente desde la memoria
+        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convertimos la hoja en un array de arrays
+
+        // Función para convertir fecha de Excel a formato DD-MM-YYYY o null si está vacía o inválida
+        const convertToDatabaseFormat = (excelDate) => {
+          if (!excelDate) return null;
+          if (excelDate instanceof Date) {
+            return excelDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+          }
+          if (typeof excelDate === 'number') {
+            const date = new Date((excelDate - 25569) * 86400 * 1000);
+            return date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+          }
+          return null;
+        };
+
+        let registrosActualizados = 0;
+
+        // Iteramos desde la fila 2 (índice 1) para leer los valores
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          const contrato = row[0]; // Contrato (columna A)
+          const estado = row[1]; // Estado (columna B)
+          const fPrimAct = convertToDatabaseFormat(row[2]); // FPrimAct (columna C)
+          const fUltDX = convertToDatabaseFormat(row[3]); // FUltDX (columna D)
+
+          // Verificar que los valores de la fila sean válidos
+          if (!contrato || !estado) {
+            console.log(`Faltan datos en la fila ${i + 1}, saltando la actualización.`);
+            continue;
+          }
+
+          // Buscar al beneficiario por el contrato
+          const beneficiario = await Beneficiario.findOne({ where: { Contrato: contrato } });
+
+          if (beneficiario) {
+            // Buscar el estado en la base de datos
+            const estadoId = await Estado.findOne({ where: { Estado: estado } });
+
+            if (!estadoId) {
+              console.log(`Estado "${estado}" no encontrado en la base de datos.`);
+              continue;
+            }
+
+            // Actualizar los campos
+            beneficiario.FPrimAct = fPrimAct;
+            beneficiario.FUltDX = fUltDX;
+            beneficiario.Estado_idEstado = estadoId.idEstado;
+
+            // Guardar en la base de datos
+            await beneficiario.save();
+            registrosActualizados++;
+          } else {
+            console.log(`Beneficiario con contrato ${contrato} no encontrado.`);
+          }
+        }
+
+        res.status(200).json({
+          message: 'Beneficiarios actualizados correctamente',
+          registrosActualizados,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Hubo un error al procesar el archivo' });
     }
   },
 };

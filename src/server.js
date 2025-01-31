@@ -17,6 +17,7 @@ const viaRoutes = require('./routes/viaRoutes');
 const tipoUnidadRoutes = require('./routes/tipoUnidadRoutes'); 
 const barrioRoutes = require('./routes/barrioRoutes'); 
 const facturacionRoutes = require('./routes/facturacionRoutes'); 
+const facturaRoutes = require('./routes/facturaRoutes'); 
 const morgan = require('morgan');
 const path = require('path');
 
@@ -80,6 +81,7 @@ app.use('/api/v1/document-type', tipoDocumentoRoutes);
 app.use('/api/v1/via', viaRoutes);
 app.use('/api/v1/unit-type', tipoUnidadRoutes);
 app.use('/api/v1/neighborhood', barrioRoutes);
+app.use('/api/v1/factura', facturaRoutes);
 
 Beneficiario.hasMany(Documento, {
   foreignKey: 'Beneficiario_idBeneficiario',

@@ -8,6 +8,7 @@ router.post('/register', authAdminRegisMiddleware, UsarController.registerBenefi
 router.get('/search-alls', authAdminRegisLectMiddleware, UsarController.getAllBeneficiaries);
 router.get('/search/:id', authAdminRegisLectMiddleware, UsarController.getBeneficiaryById);
 router.get('/search/beneficiary/:numeroDocumento', authAdminRegisLectMiddleware, UsarController.getBeneficiaryByNumeroDocumento);
+router.post('/update-from-excel', authAdminRegisMiddleware, UsarController.updateBeneficiariosFromExcel);
 router.put('/update/:id', authAdminRegisMiddleware, UsarController.updateBeneficiary);
 router.delete('/delete/:id', authAdminRegisMiddleware, UsarController.deleteBeneficiary);
 
