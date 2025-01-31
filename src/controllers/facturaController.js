@@ -121,6 +121,38 @@ const facturaController = {
       res.status(500).json({ message: 'Hubo un error al actualizar el archivo', error: error.message });
     }
   },
+
+  getAllFacturas: async (req, res) => {
+    try {
+      const facturas = await Factura.findAll(); // Consulta todos los registros de la tabla
+      res.status(200).json({ message: 'Facturas obtenidas correctamente', facturas });
+    } catch (error) {
+      console.error('Error al obtener las facturas:', error);
+      res.status(500).json({ message: 'Hubo un error al obtener las facturas', error: error.message });
+    }
+  },
+
+  getFacturasByContrato: async (req, res) => {
+    try {
+      const { contrato } = req.params; // Obtenemos el contrato desde la URL
+
+      if (!contrato) {
+        return res.status(400).json({ message: 'El número de contrato es obligatorio' });
+      }
+
+      // Buscamos todas las facturas que coincidan con el contrato
+      const facturas = await Factura.findAll({ where: { Contrato: contrato } });
+
+      if (facturas.length === 0) {
+        return res.status(404).json({ message: `No se encontraron facturas para el contrato: ${contrato}` });
+      }
+
+      res.status(200).json({ message: 'Facturas obtenidas correctamente', facturas });
+    } catch (error) {
+      console.error('Error al obtener las facturas:', error);
+      res.status(500).json({ message: 'Hubo un error al obtener las facturas', error: error.message });
+    }
+  },
 };
 
 // Función para formatear la fecha en formato DD-MM-YYYY
