@@ -746,11 +746,13 @@ async getBeneficiaryByNumeroDocumento(req, res) {
         const convertToDatabaseFormat = (excelDate) => {
           if (!excelDate) return null;
           if (excelDate instanceof Date) {
-            return excelDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const [year, month, day] = excelDate.toISOString().split('T')[0].split('-');
+            return `${day}-${month}-${year}`; // Formato DD-MM-YYYY
           }
           if (typeof excelDate === 'number') {
             const date = new Date((excelDate - 25569) * 86400 * 1000);
-            return date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const [year, month, day] = date.toISOString().split('T')[0].split('-');
+            return `${day}-${month}-${year}`; // Formato DD-MM-YYYY
           }
           return null;
         };
