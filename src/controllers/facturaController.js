@@ -1,5 +1,6 @@
 const XLSX = require('xlsx');
 const Factura = require('../models/Factura');
+const {Beneficiario} = require('../models/Beneficiario');
 
 const facturaController = {
   importExcel: async (req, res) => {
@@ -8,34 +9,37 @@ const facturaController = {
         return res.status(400).json({ message: 'No se ha subido ningún archivo Excel' });
       }
 
-      // Leer el archivo Excel desde la memoria
       const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      // Verificar que hay contenido suficiente
       if (data.length < 2) {
         return res.status(400).json({ message: 'El archivo Excel está vacío o no tiene datos suficientes' });
       }
 
-      // Omitir la primera fila (encabezados)
       const facturas = data.slice(1).map(row => ({
-        FechaFra: row[0] ? formatDate(row[0]) : null,  // Columna A (FechaFra)
-        Factura: row[1] || null,  // Columna B (# Factura)
-        Contrato: row[2] || null, // Columna C (Contrato)
-        Mes: row[7] || null, // Columna H (Mes)
-        Clase: row[8] || null, // Columna I (Clase)
-        Servicio: row[9] || null, // Columna J (Servicio)
-        AntesImptos: row[10] === 0 || row[10] ? parseInt(row[10].toString().replace(',', '').trim()) : 0,  // Columna K ($ Antes Imptos)
-        Imptos: row[11] === 0 || row[11] ? parseInt(row[11].toString().replace(',', '').trim()) : 0,  // Columna L ($ Imptos)
-        Facturado: row[12] === 0 || row[12] ? parseInt(row[12].toString().replace(',', '').trim()) : 0,  // Columna M ($ Facturado)
+        FechaFra: row[0] ? formatDate(row[0]) : null,
+        Factura: row[1] || null,
+        Contrato: row[2] || null,
+        Mes: row[7] || null,
+        Clase: row[8] || null,
+        Servicio: row[9] || null,
+        AntesImptos: row[10] ? parseInt(row[10].toString().replace(',', '').trim()) : 0,
+        Imptos: row[11] ? parseInt(row[11].toString().replace(',', '').trim()) : 0,
+        Facturado: row[12] ? parseInt(row[12].toString().replace(',', '').trim()) : 0,
       }));
 
-      // Contador para el número de registros insertados
       let registrosInsertados = 0;
+      let contratosNoEncontrados = new Set();
 
-      // Verificar si alguna de las facturas ya existe en la base de datos
       for (const factura of facturas) {
+        const beneficiario = await Beneficiario.findOne({ where: { Contrato: factura.Contrato } });
+
+        if (!beneficiario) {
+          contratosNoEncontrados.add(factura.Contrato);
+          continue;
+        }
+
         const existingFactura = await Factura.findOne({
           where: {
             FechaFra: factura.FechaFra,
@@ -47,15 +51,15 @@ const facturaController = {
         });
 
         if (!existingFactura) {
-          // Si no existe, insertar el registro
           await Factura.create(factura);
-          registrosInsertados++; // Incrementar el contador
+          registrosInsertados++;
         }
       }
 
       res.status(200).json({
         message: 'Facturas importadas correctamente',
-        registrosInsertados, // Incluir el número de registros insertados
+        registrosInsertados,
+        contratosNoEncontrados: Array.from(contratosNoEncontrados),
       });
     } catch (error) {
       console.error('Error al insertar en la base de datos:', error);

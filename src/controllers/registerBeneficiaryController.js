@@ -56,9 +56,9 @@ const registerBeneficiaryController = {
   
     // Validar campos obligatorios
     if (
-      !Nombre || !Apellido || !TipoDocumento_idTipoDocumento || !NumeroDocumento ||
-      !Correo || !FechaInicio || !CodigoDaneDpmto || !CodigoDaneMunicipio ||
-      !Direccion || !Estado_idEstado || !Estrato_idEstrato
+      !Contrato ||!Nombre || !Apellido || !TipoDocumento_idTipoDocumento || !NumeroDocumento ||
+      !Correo || !CodigoDaneDpmto || !CodigoDaneMunicipio || !Servicio ||
+      !ViaPrincipalClave || !ViaPrincipalValor || !Estado_idEstado || !Estrato_idEstrato || !Tecnologia
     ) {
       return res.status(400).json({ message: 'Todos los campos obligatorios deben ser proporcionados' });
     }
