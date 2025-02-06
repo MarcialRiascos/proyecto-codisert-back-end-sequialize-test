@@ -7,6 +7,7 @@ const TipoDocumento = require('../models/TipoDocumento');
 const Administrador = require('../models/Administrador');
 const Sexo = require('../models/Sexo'); // Modelo de Sexo
 const Documento = require('../models/Documento'); // Modelo de Sexo
+const Factura = require('../models/Factura'); // Modelo de Sexo
 const path = require('path'); // Asegúrate de importar 'path' al principio de tu archivo
 const fs = require('fs').promises; // Asegúrate de importar 'fs' correctamente
 const XLSX = require('xlsx');
@@ -190,9 +191,37 @@ const registerBeneficiaryController = {
         return res.status(404).json({ message: 'No se encontraron beneficiarios' });
       }
   
+      // Obtener los contratos de los beneficiarios para buscar sus facturas
+      const contratos = beneficiaries.map(b => b.Contrato);
+      
+      // Buscar las facturas que coincidan con esos contratos
+      const facturas = await Factura.findAll({
+        where: { Contrato: contratos }
+      });
+  
+      // Organizar las facturas en un objeto por contrato para acceso rápido
+      const facturasPorContrato = facturas.reduce((acc, factura) => {
+        if (!acc[factura.Contrato]) {
+          acc[factura.Contrato] = [];
+        }
+        acc[factura.Contrato].push({
+          idFactura: factura.idFactura,
+          FechaFra: factura.FechaFra,
+          Factura: factura.Factura,
+          Mes: factura.Mes,
+          Clase: factura.Clase,
+          Servicio: factura.Servicio,
+          AntesImptos: factura.AntesImptos,
+          Imptos: factura.Imptos,
+          Facturado: factura.Facturado
+        });
+        return acc;
+      }, {});
+  
+      // Formatear la respuesta con la misma estructura original y agregando las facturas
       const formattedBeneficiaries = beneficiaries.map(beneficiary => ({
         idBeneficiario: beneficiary.idBeneficiario,
-        Contrato: beneficiary.Contrato, // Nuevo campo
+        Contrato: beneficiary.Contrato,
         Nombre: beneficiary.Nombre,
         Apellido: beneficiary.Apellido,
         TipoDocumento: beneficiary.tipoDocumento ? {
@@ -202,7 +231,7 @@ const registerBeneficiaryController = {
         NumeroDocumento: beneficiary.NumeroDocumento,
         Telefono: beneficiary.Telefono,
         Celular: beneficiary.Celular,
-        TelefonoTres: beneficiary.TelefonoTres, // Nuevo campo
+        TelefonoTres: beneficiary.TelefonoTres,
         Correo: beneficiary.Correo,
         FechaNacimiento: beneficiary.FechaNacimiento,
         FechaInicio: beneficiary.FechaInicio,
@@ -211,18 +240,18 @@ const registerBeneficiaryController = {
         CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
-        Servicio: beneficiary.Servicio, // Nuevo campo
-        Tecnologia: beneficiary.Tecnologia, // Nuevo campo
+        Servicio: beneficiary.Servicio,
+        Tecnologia: beneficiary.Tecnologia,
         Direccion: beneficiary.Direccion,
-        ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
-        ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
-        ViaSecundariaClave: beneficiary.ViaSecundariaClave, // Nuevo campo
-        ViaSecundariaValor: beneficiary.ViaSecundariaValor, // Nuevo campo
-        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos, // Nuevo campo
-        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave, // Nuevo campo
-        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor, // Nuevo campo
-        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave, // Nuevo campo
-        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor, // Nuevo campo
+        ViaPrincipalClave: beneficiary.ViaPrincipalClave,
+        ViaPrincipalValor: beneficiary.ViaPrincipalValor,
+        ViaSecundariaClave: beneficiary.ViaSecundariaClave,
+        ViaSecundariaValor: beneficiary.ViaSecundariaValor,
+        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos,
+        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave,
+        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor,
+        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave,
+        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
         Estado: beneficiary.estado ? {
@@ -236,7 +265,7 @@ const registerBeneficiaryController = {
         Estrato: beneficiary.estrato ? {
           id: beneficiary.estrato.idEstrato,
           nombre: beneficiary.estrato.Estrato
-        } : null, // Aquí añadimos el estrato
+        } : null,
         Administrador: {
           idAdministrador: beneficiary.administrador ? beneficiary.administrador.idAdministrador : null,
           Nombre: beneficiary.administrador ? beneficiary.administrador.Nombre : null,
@@ -250,6 +279,7 @@ const registerBeneficiaryController = {
           TipoDocumento: doc.TipoDocumento,
           Url: doc.Url,
         })),
+        Facturas: facturasPorContrato[beneficiary.Contrato] || [] // Agregar facturas si existen
       }));
   
       res.status(200).json({
@@ -268,7 +298,7 @@ const registerBeneficiaryController = {
   // Obtener un beneficiario por su ID
   async getBeneficiaryById(req, res) {   
     const { id } = req.params;
-
+  
     try {
       const beneficiary = await Beneficiario.findOne({
         where: {
@@ -305,22 +335,30 @@ const registerBeneficiaryController = {
             as: 'sexo',
           },
           {
-            model: Documento,  // Incluir los documentos relacionados
+            model: Documento,
             attributes: ['idDocumentos', 'NombreDocumento', 'TipoDocumento', 'Url'],
-            as: 'documentos',  // Alias de la relación
+            as: 'documentos',
           },
         ],
       });
-
+  
       console.log(beneficiary);
-
+  
       if (!beneficiary) {
         return res.status(404).json({ message: 'Beneficiario no encontrado' });
       }
-
+  
+      // Obtener facturas asociadas al beneficiario usando el número de contrato
+      const facturas = await Factura.findAll({
+        where: {
+          Contrato: beneficiary.Contrato,
+        },
+        attributes: ['idFactura', 'FechaFra', 'Factura', 'Mes', 'Clase', 'Servicio', 'AntesImptos', 'Imptos', 'Facturado'],
+      });
+  
       const formattedBeneficiary = {
         idBeneficiario: beneficiary.idBeneficiario,
-        Contrato: beneficiary.Contrato, // Nuevo campo
+        Contrato: beneficiary.Contrato, 
         Nombre: beneficiary.Nombre,
         Apellido: beneficiary.Apellido,
         TipoDocumento: beneficiary.tipoDocumento ? {
@@ -330,7 +368,7 @@ const registerBeneficiaryController = {
         NumeroDocumento: beneficiary.NumeroDocumento,
         Telefono: beneficiary.Telefono,
         Celular: beneficiary.Celular,
-        TelefonoTres: beneficiary.TelefonoTres, // Nuevo campo
+        TelefonoTres: beneficiary.TelefonoTres, 
         Correo: beneficiary.Correo,
         FechaNacimiento: beneficiary.FechaNacimiento,
         FechaInicio: beneficiary.FechaInicio,
@@ -339,18 +377,18 @@ const registerBeneficiaryController = {
         CodigoDaneMunicipio: beneficiary.CodigoDaneMunicipio,
         Departamento: beneficiary.Departamento,
         Municipio: beneficiary.Municipio,
-        Servicio: beneficiary.Servicio, // Nuevo campo
-        Tecnologia: beneficiary.Tecnologia, // Nuevo campo
+        Servicio: beneficiary.Servicio,
+        Tecnologia: beneficiary.Tecnologia,
         Direccion: beneficiary.Direccion,
-        ViaPrincipalClave: beneficiary.ViaPrincipalClave, // Nuevo campo
-        ViaPrincipalValor: beneficiary.ViaPrincipalValor, // Nuevo campo
-        ViaSecundariaClave: beneficiary.ViaSecundariaClave, // Nuevo campo
-        ViaSecundariaValor: beneficiary.ViaSecundariaValor, // Nuevo campo
-        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos, // Nuevo campo
-        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave, // Nuevo campo
-        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor, // Nuevo campo
-        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave, // Nuevo campo
-        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor, // Nuevo campo
+        ViaPrincipalClave: beneficiary.ViaPrincipalClave,
+        ViaPrincipalValor: beneficiary.ViaPrincipalValor,
+        ViaSecundariaClave: beneficiary.ViaSecundariaClave,
+        ViaSecundariaValor: beneficiary.ViaSecundariaValor,
+        ViaSecundariaValorDos: beneficiary.ViaSecundariaValorDos,
+        TipoUnidadUnoClave: beneficiary.TipoUnidadUnoClave,
+        TipoUnidadUnoValor: beneficiary.TipoUnidadUnoValor,
+        TipoUnidadDosClave: beneficiary.TipoUnidadDosClave,
+        TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
         Estado: beneficiary.estado ? {
@@ -364,7 +402,7 @@ const registerBeneficiaryController = {
         Estrato: beneficiary.estrato ? {
           id: beneficiary.estrato.idEstrato,
           nombre: beneficiary.estrato.Estrato,
-        } : null, // Aquí añadimos el estrato
+        } : null,
         Administrador: {
           idAdministrador: beneficiary.administrador ? beneficiary.administrador.idAdministrador : null,
           Nombre: beneficiary.administrador ? beneficiary.administrador.Nombre : null,
@@ -378,8 +416,19 @@ const registerBeneficiaryController = {
           TipoDocumento: doc.TipoDocumento,
           Url: doc.Url,
         })),
+        Facturas: facturas.map(factura => ({
+          idFactura: factura.idFactura,
+          FechaFra: factura.FechaFra,
+          Factura: factura.Factura,
+          Mes: factura.Mes,
+          Clase: factura.Clase,
+          Servicio: factura.Servicio,
+          AntesImptos: factura.AntesImptos,
+          Imptos: factura.Imptos,
+          Facturado: factura.Facturado,
+        })),
       };
-
+  
       res.status(200).json({
         message: 'Beneficiario encontrado',
         data: formattedBeneficiary,
