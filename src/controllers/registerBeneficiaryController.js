@@ -254,6 +254,8 @@ const registerBeneficiaryController = {
         TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
+        FPrimAct: beneficiary.FPrimAct,  
+        FUltDX: beneficiary.FUltDX,      
         Estado: beneficiary.estado ? {
           id: beneficiary.estado.idEstado,
           nombre: beneficiary.estado.Estado
@@ -391,6 +393,8 @@ const registerBeneficiaryController = {
         TipoUnidadDosValor: beneficiary.TipoUnidadDosValor,
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
+        FPrimAct: beneficiary.FPrimAct,  
+        FUltDX: beneficiary.FUltDX,
         Estado: beneficiary.estado ? {
           id: beneficiary.estado.idEstado,
           nombre: beneficiary.estado.Estado,
