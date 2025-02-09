@@ -34,6 +34,11 @@ module.exports = {
         Estado: 'Registrado',
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      {
+        Estado: 'Retirado',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ], {});
   },
