@@ -24,16 +24,6 @@ module.exports = {
         Estrato: '4',
         createdAt: new Date(),
         updatedAt: new Date(),
-      },
-      {
-        Estrato: '5',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        Estrato: '6',
-        createdAt: new Date(),
-        updatedAt: new Date(),
       }
     ], {});
   },
