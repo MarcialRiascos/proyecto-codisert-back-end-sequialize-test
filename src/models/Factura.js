@@ -8,7 +8,7 @@ const Factura = sequelize.define('Factura', {
     primaryKey: true
   },
   FechaFra: {
-    type: DataTypes.STRING(45),
+    type: DataTypes.DATEONLY,
     allowNull: true
   },
   Factura: {
