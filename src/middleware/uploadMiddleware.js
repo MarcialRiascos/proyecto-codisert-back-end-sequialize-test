@@ -38,6 +38,9 @@ const storage = multer.diskStorage({
         case 'anexo':
         uploadPath = path.join(uploadPath, 'anexos');
         break;
+        case 'fachadado':
+        uploadPath = path.join(uploadPath, 'fachadados');
+        break;
       default:
         uploadPath = path.join(uploadPath, 'otros'); // Para documentos no clasificados
         break;

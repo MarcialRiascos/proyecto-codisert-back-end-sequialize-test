@@ -30,7 +30,8 @@ const registerDocumentController = {
         test: 'tests',
         serial: 'seriales',
         recibo: 'recibos',
-        anexo: 'anexos'
+        anexo: 'anexos',
+        fachadado: 'fachadados'
       };
 
       // Variable para controlar si se debe responder ya

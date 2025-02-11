@@ -22,7 +22,7 @@ const Documento = sequelize.define('Documento', {
     allowNull: false,
     get() {
       const url = this.getDataValue('Url');  // Obtén el valor del campo 'url'
-      const host = process.env.HOST_URL_PROD || 'https://proyecto-codisert-back-end-sequialize.onrender.com/';  // Usa la variable de entorno o un valor predeterminado
+      const host = process.env.HOST_URL_PROD || 'https://localhost:3000/';  // Usa la variable de entorno o un valor predeterminado
       return url ? `${host}${url}` : null;  // Devuelve la URL completa
     },
   },
