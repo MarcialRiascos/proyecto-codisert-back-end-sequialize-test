@@ -11,5 +11,6 @@ router.get('/search/beneficiary/:numeroDocumento', authAdminRegisLectMiddleware,
 router.post('/update-from-excel', authAdminRegisMiddleware, UsarController.updateBeneficiariosFromExcel);
 router.put('/update/:id', authAdminRegisMiddleware, UsarController.updateBeneficiary);
 router.delete('/delete/:id', authAdminRegisMiddleware, UsarController.deleteBeneficiary);
+router.get('/combined-documents/:id', authAdminRegisMiddleware, UsarController.getCombinedDocuments);
 
 module.exports = router;

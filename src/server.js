@@ -20,6 +20,11 @@ const facturacionRoutes = require('./routes/facturacionRoutes');
 const facturaRoutes = require('./routes/facturaRoutes'); 
 const morgan = require('morgan');
 const path = require('path');
+const cron = require('node-cron');
+const cleanOldFiles = require('./utils/fileCleaner');
+const combinedDocsPath = path.join(__dirname, 'public', 'combined_documents');
+const maxFileAge = 1 * 60 * 60 * 1000;
+
 
 
 
@@ -65,6 +70,8 @@ app.use('/uploads/seriales', express.static(path.join(__dirname, '../uploads/ser
 app.use('/uploads/recibos', express.static(path.join(__dirname, '../uploads/recibos')));
 app.use('/uploads/anexos', express.static(path.join(__dirname, '../uploads/anexos')));
 app.use('/uploads/fachadado', express.static(path.join(__dirname, '../uploads/fachadado')));
+app.use('/combined_documents', express.static(path.join(__dirname, 'public', 'combined_documents')));
+
 
 // Rutas
 app.use('/auth', authRoutes);
@@ -94,6 +101,11 @@ Documento.belongsTo(Beneficiario, {
   foreignKey: 'Beneficiario_idBeneficiario',  // Clave foránea en Documento
   // targetKey: 'idBeneficiario',  // Clave primaria en Beneficiario
   // as: 'beneficiario',  // Alias para la relación
+});
+
+cron.schedule('0 * * * *', () => {
+  console.log('Ejecutando tarea programada: limpieza de archivos antiguos');
+  cleanOldFiles(combinedDocsPath, maxFileAge);
 });
 
 // Sincroniza la base de datos con Sequelize antes de iniciar el servidor

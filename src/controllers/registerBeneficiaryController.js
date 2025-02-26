@@ -13,6 +13,7 @@ const fs = require('fs').promises; // Asegúrate de importar 'fs' correctamente
 const XLSX = require('xlsx');
 const upload = require('../middleware/actualizarEstadoMiddleware'); // Middleware de carga
 const moment = require('moment');
+const { combineDocuments } = require('../utils/documentUtils');
 
 const registerBeneficiaryController = {
   // Registrar un beneficiario
@@ -859,6 +860,57 @@ async getBeneficiaryByNumeroDocumento(req, res) {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Hubo un error al procesar el archivo' });
+    }
+  },
+
+   // Método para obtener el PDF combinado de los documentos de un beneficiario
+   async getCombinedDocuments(req, res) {
+    const { id } = req.params;
+  
+    try {
+      // Obtener el beneficiario junto con sus documentos y el campo Contrato
+      const beneficiary = await Beneficiario.findOne({
+        where: { idBeneficiario: id },
+        attributes: ['Contrato'], // Incluir el atributo Contrato
+        include: [
+          {
+            model: Documento,
+            attributes: ['Url'],
+            as: 'documentos',
+          },
+        ],
+      });
+  
+      if (!beneficiary) {
+        return res.status(404).json({ message: 'Beneficiario no encontrado' });
+      }
+  
+      // Extraer las URLs de los documentos
+      const documentUrls = beneficiary.documentos.map(doc => doc.Url);
+  
+      // Combinar los documentos en un único PDF
+      const combinedPdfBytes = await combineDocuments(documentUrls);
+  
+      // Definir la ruta donde se guardará el PDF combinado utilizando el campo Contrato
+      const pdfPath = path.join(__dirname, '..', 'public', 'combined_documents', `beneficiario_${beneficiary.Contrato}_documentos.pdf`);
+  
+      // Crear el directorio si no existe
+      await fs.mkdir(path.dirname(pdfPath), { recursive: true });
+  
+      // Guardar el PDF en el servidor
+      await fs.writeFile(pdfPath, combinedPdfBytes);
+  
+      // Generar la URL de descarga
+      const downloadUrl = `${req.protocol}://${req.get('host')}/combined_documents/beneficiario_${beneficiary.Contrato}_documentos.pdf`;
+  
+      // Enviar la URL de descarga al cliente
+      res.status(200).json({ downloadUrl });
+    } catch (err) {
+      console.error('Error al generar el PDF combinado:', err);
+      res.status(500).json({
+        message: 'Error al generar el PDF combinado',
+        error: err.message,
+      });
     }
   },
 };
