@@ -244,6 +244,7 @@ const registerBeneficiaryController = {
         Servicio: beneficiary.Servicio,
         Tecnologia: beneficiary.Tecnologia,
         Direccion: beneficiary.Direccion,
+        Nacionalidad: beneficiary.Nacionalidad,
         ViaPrincipalClave: beneficiary.ViaPrincipalClave,
         ViaPrincipalValor: beneficiary.ViaPrincipalValor,
         ViaSecundariaClave: beneficiary.ViaSecundariaClave,
@@ -256,7 +257,12 @@ const registerBeneficiaryController = {
         Barrio: beneficiary.Barrio,
         Anexo: beneficiary.Anexo,
         FPrimAct: beneficiary.FPrimAct,  
-        FUltDX: beneficiary.FUltDX,      
+        FUltDX: beneficiary.FUltDX,
+        SerialCpe: beneficiary.SerialCpe,  
+        FabricanteCpe: beneficiary.FabricanteCpe,      
+        FechaInstalacion: beneficiary.FechaInstalacion,  
+        Latitud: beneficiary.Latitud,   
+        Longitud: beneficiary.Longitud,   
         Estado: beneficiary.estado ? {
           id: beneficiary.estado.idEstado,
           nombre: beneficiary.estado.Estado
@@ -383,6 +389,7 @@ const registerBeneficiaryController = {
         Servicio: beneficiary.Servicio,
         Tecnologia: beneficiary.Tecnologia,
         Direccion: beneficiary.Direccion,
+        Nacionalidad: beneficiary.Nacionalidad,
         ViaPrincipalClave: beneficiary.ViaPrincipalClave,
         ViaPrincipalValor: beneficiary.ViaPrincipalValor,
         ViaSecundariaClave: beneficiary.ViaSecundariaClave,
@@ -396,6 +403,11 @@ const registerBeneficiaryController = {
         Anexo: beneficiary.Anexo,
         FPrimAct: beneficiary.FPrimAct,  
         FUltDX: beneficiary.FUltDX,
+        SerialCpe: beneficiary.SerialCpe,  
+        FabricanteCpe: beneficiary.FabricanteCpe,      
+        FechaInstalacion: beneficiary.FechaInstalacion,  
+        Latitud: beneficiary.Latitud,   
+        Longitud: beneficiary.Longitud, 
         Estado: beneficiary.estado ? {
           id: beneficiary.estado.idEstado,
           nombre: beneficiary.estado.Estado,
@@ -862,6 +874,68 @@ async getBeneficiaryByNumeroDocumento(req, res) {
       res.status(500).json({ message: 'Hubo un error al procesar el archivo' });
     }
   },
+
+
+// Método para importar y actualizar Beneficiarios desde Excel
+updateBeneficiariosFromExcelCPE: async (req, res) => {
+  try {
+    upload(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'No se ha subido ningún archivo Excel' });
+      }
+
+      // Leer el archivo Excel
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0]; // Obtener la primera hoja
+      const sheet = workbook.Sheets[sheetName];
+
+      // Convertir a JSON
+      const data = XLSX.utils.sheet_to_json(sheet, { raw: false });
+
+      // Validar que hay datos
+      if (data.length === 0) {
+        return res.status(400).json({ message: 'El archivo está vacío o mal formateado' });
+      }
+
+      let updatedCount = 0;
+      let contratosActualizados = []; // Lista de contratos actualizados
+
+      // Recorrer cada fila y actualizar en la DB
+      for (const row of data) {
+        const { Contrato, Serial_cpe, Fabricante_cpe, Fecha_Instalacion, Latitud, Longitud } = row;
+
+        // Verificar si el contrato existe
+        const beneficiario = await Beneficiario.findOne({ where: { Contrato } });
+
+        if (beneficiario) {
+          // Actualizar los datos correspondientes
+          await beneficiario.update({
+            SerialCpe: Serial_cpe,
+            FabricanteCpe: Fabricante_cpe,
+            FechaInstalacion: Fecha_Instalacion,
+            Latitud,
+            Longitud
+          });
+          updatedCount++;
+          contratosActualizados.push(Contrato); // Guardar número de contrato actualizado
+        }
+      }
+
+      res.json({
+        message: `Se actualizaron ${updatedCount} beneficiarios correctamente`,
+        contratos_actualizados: contratosActualizados
+      });
+
+    });
+  } catch (error) {
+    console.error('Error al procesar el archivo:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+},
 
    // Método para obtener el PDF combinado de los documentos de un beneficiario
    async getCombinedDocuments(req, res) {

@@ -92,6 +92,10 @@ const Beneficiario = sequelize.define('Beneficiario', {
     type: DataTypes.STRING(45),
     allowNull: true,
   },
+  Nacionalidad: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
   ViaPrincipalClave: {
     type: DataTypes.STRING(45),
     allowNull: true,
@@ -141,6 +145,26 @@ const Beneficiario = sequelize.define('Beneficiario', {
     allowNull: true,
   },
   FUltDX: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  SerialCpe: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  FabricanteCpe: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  FechaInstalacion: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  Latitud: {
+    type: DataTypes.STRING(45),
+    allowNull: true,
+  },
+  Longitud: {
     type: DataTypes.STRING(45),
     allowNull: true,
   },
