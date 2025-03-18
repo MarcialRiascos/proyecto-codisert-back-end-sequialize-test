@@ -9,7 +9,7 @@ const { Op } = require('sequelize');
 
 const registerDocumentController = {
   async uploadDocument(req, res) {
-    let alreadyResponded = false; // 🔹 Ahora sí está definido
+    let alreadyResponded = false;
   
     try {
       const { idBeneficiario } = req.params;
@@ -75,19 +75,16 @@ const registerDocumentController = {
             return;
           }
   
-          // 🔹 Extraer el nombre del archivo sin la extensión
-          const baseNombreDocumento = path.parse(NombreDocumento).name;
-  
-          // 🔹 Buscar documentos con el mismo nombre sin la extensión
+          // 🔹 Buscar documentos previos con el mismo TipoDocumento
           const documentosPrevios = await Documento.findAll({
             where: {
               Beneficiario_idBeneficiario: idBeneficiario,
-              NombreDocumento: { [Op.like]: `${baseNombreDocumento}%` } // Busca nombres similares
+              TipoDocumento: TipoDocumento // Filtra solo por documentos del mismo tipo
             }
           });
   
           if (documentosPrevios.length > 0) {
-            // 🔹 Eliminar todos los documentos previos encontrados
+            // 🔹 Eliminar documentos previos del mismo tipo
             await Promise.all(documentosPrevios.map(async (doc) => {
               await Documento.destroy({ where: { idDocumentos: doc.idDocumentos } });
   
