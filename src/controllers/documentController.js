@@ -4,24 +4,23 @@ const path = require('path');
 const fs = require('fs').promises;
 const { Beneficiario } = require('../models/Beneficiario');
 const Administrador = require('../models/Administrador');
+const { Op } = require('sequelize'); 
+
 
 const registerDocumentController = {
   async uploadDocument(req, res) {
+    let alreadyResponded = false; // 🔹 Ahora sí está definido
+  
     try {
       const { idBeneficiario } = req.params;
-
-      // Verificar que se haya cargado un archivo
+  
       if (!req?.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ message: 'No se ha cargado ningún archivo' });
       }
-
-      // Obtener el ID del administrador desde el usuario autenticado
+  
       const Administrador_idAdministrador = req.user.id;
-
-      // Obtener todos los archivos cargados
       const archivos = Object.getOwnPropertyNames(req.files).map(name => req.files[name][0]);
-
-      // Definir las rutas de los tipos de documentos
+  
       const tipoDocumentosRuta = {
         contrato: 'contratos',
         dni: 'dnis',
@@ -33,53 +32,41 @@ const registerDocumentController = {
         anexo: 'anexos',
         fachadado: 'fachadados'
       };
-
-      // Variable para controlar si se debe responder ya
-      let alreadyResponded = false;
-
-      // Validar y procesar los archivos cargados
+  
       await Promise.all(
         archivos.map(async (file) => {
           const NombreDocumento = file.filename;
-          const TipoDocumento = req.body[`${file.fieldname}_TipoDocumento`]; // Obtener TipoDocumento desde req.body
-
-
-          // Validar que TipoDocumento no esté vacío
+          const TipoDocumento = req.body[`${file.fieldname}_TipoDocumento`];
+  
           if (!TipoDocumento) {
             if (!alreadyResponded) {
               alreadyResponded = true;
               return res.status(400).json({ message: `El tipo de documento para ${file.fieldname} es obligatorio.` });
             }
-            return; // Si ya se envió respuesta, no continuar procesando.
+            return;
           }
-
-          // Obtener la carpeta correspondiente al TipoDocumento
+  
           const carpetaDocumento = tipoDocumentosRuta[TipoDocumento];
-
           if (!carpetaDocumento) {
             if (!alreadyResponded) {
               alreadyResponded = true;
               return res.status(400).json({ message: `Tipo de documento '${TipoDocumento}' no válido.` });
             }
-            return; // Si ya se envió respuesta, no continuar procesando.
+            return;
           }
-
-          // Formar la URL completa
+  
           const urlDocumento = `uploads/${carpetaDocumento}/${file.filename}`;
-
-          // Aquí puedes agregar validaciones de tipo de archivo y tamaño si es necesario
-          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'application/msword', 'application/vnd.ms-excel', // Excel antiguo (.xls)
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']; // Agregar los tipos permitidos
+          const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'application/msword', 'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
           if (!allowedTypes.includes(file.mimetype)) {
             if (!alreadyResponded) {
               alreadyResponded = true;
               return res.status(400).json({ message: `El archivo ${file.originalname} tiene un tipo no permitido.` });
-
             }
             return;
           }
-
-          const maxSize = 5 * 1024 * 1024; // 5MB
+  
+          const maxSize = 5 * 1024 * 1024;
           if (file.size > maxSize) {
             if (!alreadyResponded) {
               alreadyResponded = true;
@@ -87,34 +74,44 @@ const registerDocumentController = {
             }
             return;
           }
-
-          // Verificar si el documento ya existe en la base de datos (con la misma URL)
-          const documentoExistente = await Documento.findOne({ where: { Url: urlDocumento, Beneficiario_idBeneficiario: idBeneficiario } });
-
-          if (documentoExistente) {
-            // Si el documento ya existe, no insertamos otro registro, pero podemos continuar con la carga del archivo
-            if (!alreadyResponded) {
-              alreadyResponded = true;
-              return res.status(200).json({
-                message: 'El documento ya existe, pero el archivo ha sido subido correctamente.',
-                TipoDocumento: TipoDocumento // Devuelves el valor de TipoDocumento
-              });
-
-
+  
+          // 🔹 Extraer el nombre del archivo sin la extensión
+          const baseNombreDocumento = path.parse(NombreDocumento).name;
+  
+          // 🔹 Buscar documentos con el mismo nombre sin la extensión
+          const documentosPrevios = await Documento.findAll({
+            where: {
+              Beneficiario_idBeneficiario: idBeneficiario,
+              NombreDocumento: { [Op.like]: `${baseNombreDocumento}%` } // Busca nombres similares
             }
-            return;
+          });
+  
+          if (documentosPrevios.length > 0) {
+            // 🔹 Eliminar todos los documentos previos encontrados
+            await Promise.all(documentosPrevios.map(async (doc) => {
+              await Documento.destroy({ where: { idDocumentos: doc.idDocumentos } });
+  
+              // Registrar eliminación en HistorialCambio
+              await HistorialCambio.create({
+                Accion: 'Eliminación',
+                ValorAnterior: JSON.stringify(doc),
+                ValorNuevo: 'N/A',
+                Administrador_idAdministrador,
+                Beneficiario_idBeneficiario: idBeneficiario,
+              });
+            }));
           }
-
-          // Si no existe, insertar el nuevo documento
+  
+          // 🔹 Insertar el nuevo documento
           const documento = await Documento.create({
             NombreDocumento,
             TipoDocumento,
-            Url: urlDocumento,  // Aquí guardamos la URL completa con la carpeta
+            Url: urlDocumento,
             Beneficiario_idBeneficiario: idBeneficiario,
             Administrador_idAdministrador,
           });
-
-          // Registrar el cambio en HistorialCambio
+  
+          // Registrar creación en HistorialCambio
           await HistorialCambio.create({
             Accion: 'Creación',
             ValorAnterior: 'N/A',
@@ -124,20 +121,17 @@ const registerDocumentController = {
           });
         })
       );
-
-      // Si todo fue bien y no se ha respondido aún, se envía la respuesta final
+  
       if (!alreadyResponded) {
         res.status(200).json({ message: 'Archivos cargados y documentos registrados correctamente.' });
       }
     } catch (error) {
       console.error(error);
-      // Solo responder si no se ha hecho ya
       if (!alreadyResponded) {
         res.status(500).json({ message: 'Error al procesar los archivos. Intenta nuevamente más tarde.' });
       }
     }
   },
-
 
   // Función para obtener todos los documentos
   async getAllDocuments(req, res) {
